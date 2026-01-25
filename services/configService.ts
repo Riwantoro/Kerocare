@@ -4,36 +4,28 @@ import { getDatabase, ref, onValue, set } from 'firebase/database';
 // =============================================================================================
 // KONFIGURASI DATABASE PUSAT (FIREBASE)
 // =============================================================================================
-// Agar settingan Admin berlaku GLOBAL (untuk semua HP), Anda WAJIB mengisi config ini.
-// 1. Buka https://console.firebase.google.com/
-// 2. Buat Project Baru (Gratis) -> Continue -> Continue.
-// 3. Masuk ke Project -> Klik icon Web (</>) -> Register App "Sithem".
-// 4. Copy data "const firebaseConfig = {...}" dan paste di bawah ini menggantikan data dummy.
-// 5. PENTING: Di menu "Realtime Database" -> "Rules", ubah ".read": false, ".write": false menjadi true (untuk testing).
+// Project: kerocare-4dd07
+// Region: asia-southeast1
 
 const firebaseConfig = {
-  // --- GANTI BAGIAN INI DENGAN CONFIG FIREBASE ANDA SENDIRI ---
-  apiKey: "ISI_API_KEY_FIREBASE_DISINI",
-  authDomain: "sithem-app.firebaseapp.com",
-  databaseURL: "https://sithem-app-default-rtdb.asia-southeast1.firebasedatabase.app", 
-  projectId: "sithem-app",
-  storageBucket: "sithem-app.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
-  // -----------------------------------------------------------
+  apiKey: "AIzaSyCoVrVO49TT9AYG9pNYxNcdDoewwMxYLw4",
+  authDomain: "kerocare-4dd07.firebaseapp.com",
+  databaseURL: "https://kerocare-4dd07-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kerocare-4dd07",
+  storageBucket: "kerocare-4dd07.firebasestorage.app",
+  messagingSenderId: "783986267097",
+  appId: "1:783986267097:web:8979cbdc30de07af96ffc8",
+  measurementId: "G-70GJN70EJ9"
 };
+
+// =============================================================================================
 
 let db: any = null;
 
 try {
-  // Cek apakah config masih dummy (belum diganti user)
-  if (firebaseConfig.apiKey === "ISI_API_KEY_FIREBASE_DISINI") {
-    console.warn("⚠️ PERINGATAN: Firebase Config belum diisi di 'services/configService.ts'. Fitur Global Database tidak akan berfungsi.");
-  } else {
-    const app = initializeApp(firebaseConfig);
-    db = getDatabase(app);
-    console.log("✅ Terhubung ke Database Pusat (Firebase)");
-  }
+  const app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  console.log("✅ Terhubung ke Database Pusat (Firebase kerocare-4dd07) - Siap menerima perintah Admin.");
 } catch (e) {
   console.error("Gagal menghubungkan ke Firebase:", e);
 }
@@ -43,14 +35,15 @@ export interface GlobalConfig {
   geminiApiKey: string;
 }
 
-// Fungsi untuk mendengarkan perubahan data secara Realtime
+// Fungsi untuk mendengarkan perubahan data secara Realtime (Untuk User)
 export const subscribeToConfig = (callback: (data: GlobalConfig) => void) => {
-  if (!db) return () => {}; // Return no-op cleanup if no db
+  if (!db) return () => {};
 
   const configRef = ref(db, 'kero_config');
   const unsubscribe = onValue(configRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
+      console.log("🔄 Menerima Update Config Baru dari Pusat...");
       callback({
         announcement: data.announcement || "",
         geminiApiKey: data.geminiApiKey || ""
@@ -61,10 +54,10 @@ export const subscribeToConfig = (callback: (data: GlobalConfig) => void) => {
   return unsubscribe;
 };
 
-// Fungsi untuk Admin mengupdate data ke Pusat
+// Fungsi untuk Admin mengupdate data ke Pusat (Untuk Admin Panel)
 export const updateGlobalConfig = (announcement: string, apiKey: string) => {
   if (!db) {
-    alert("GAGAL: Database Pusat belum disetting.\n\nSilakan edit file 'services/configService.ts' dan masukkan config Firebase Anda.");
+    alert("GAGAL MENYIMPAN: Gagal terhubung ke Database Firebase.");
     return;
   }
   
@@ -73,8 +66,8 @@ export const updateGlobalConfig = (announcement: string, apiKey: string) => {
     geminiApiKey: apiKey,
     lastUpdated: new Date().toISOString()
   }).then(() => {
-    alert("✅ Berhasil disimpan ke Database Pusat!\nSemua pengguna akan mendapatkan update ini secara otomatis.");
+    alert("✅ SUKSES: Data tersimpan di Database Pusat.\n\nDalam 1-2 detik, semua HP pengunjung akan otomatis terupdate.");
   }).catch((error) => {
-    alert("Gagal menyimpan: " + error.message);
+    alert("GAGAL: " + error.message + "\n\nMohon cek tab 'Rules' di Firebase Console, pastikan .write = true.");
   });
 };

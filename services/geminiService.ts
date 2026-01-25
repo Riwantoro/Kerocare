@@ -98,10 +98,9 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // KEMBALI KE gemini-2.0-flash-exp AGAR LEBIH KOMPATIBEL
-      // Versi 'exp' biasanya lebih permissive untuk akun gratisan/baru.
+      // Gunakan model stabil 'gemini-2.0-flash' untuk production
       chatSession = ai.chats.create({
-        model: 'gemini-2.0-flash-exp', 
+        model: 'gemini-2.0-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
@@ -162,14 +161,12 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     const errString = error.toString().toLowerCase();
     
     if (errString.includes("429") || errString.includes("quota")) {
-      console.warn("KUOTA HABIS. Silakan ganti API Key.");
+      console.warn("KUOTA HABIS. Silakan Admin ganti API Key via Admin Panel.");
     } else if (errString.includes("404") || errString.includes("not found")) {
-      console.warn("MODEL TIDAK DITEMUKAN. Kemungkinan model 'gemini-2.0-flash-exp' sedang down, coba 'gemini-1.5-flash'.");
+      console.warn("Model AI tidak ditemukan.");
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       console.warn("AKSES DITOLAK (403). Cek pengaturan API Key di Google AI Studio. Pastikan tidak ada 'API Restrictions' atau 'Referrer' yang memblokir domain aplikasi ini.");
-       errorMessage = "Mohon maaf, koneksi ke sistem keamanan (API Key) terblokir. Jika ini adalah aplikasi resmi, mohon lapor ke Admin untuk cek pengaturan 'Referrer' pada Google AI Studio.";
-    } else if (errString.includes("fetch") || errString.includes("network")) {
-       errorMessage = "Koneksi internet terputus atau tidak stabil. Mohon periksa sinyal Gek/Bli nggih.";
+       console.warn("AKSES DITOLAK (403). API Key mungkin salah atau diblokir.");
+       errorMessage = "Mohon maaf, koneksi ke sistem keamanan terblokir. Admin sedang melakukan perbaikan.";
     }
 
     return { 
