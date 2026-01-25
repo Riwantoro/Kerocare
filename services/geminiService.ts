@@ -2,10 +2,10 @@ import { GoogleGenAI, Chat } from "@google/genai";
 import { EmoteType } from "../types";
 
 // =============================================================================================
-// KONFIGURASI API KEY (FALLBACK)
+// KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-// Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
-// Diupdate dengan Key Baru dari User.
+// Key Baru dari Bli (AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY)
+// Kita set ini sebagai PRIMARY KEY agar tidak tertimpa oleh key lama di database.
 const HARDCODED_API_KEY = "AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY"; 
 // =============================================================================================
 
@@ -72,16 +72,15 @@ export const resetSession = () => {
 // Modified to accept a dynamic API Key from Global Config
 export const initializeChat = (adminAnnouncement: string = "", globalApiKey: string = ""): Chat | null => {
   
-  // Logic Prioritas API Key:
-  // 1. Global Config (Dari Firebase/Database Pusat) - PRIORITAS UTAMA
-  // 2. Hardcoded (Fallback jika Database mati/kosong)
+  // PERUBAHAN PENTING:
+  // Kita Paksa menggunakan HARDCODED_API_KEY yang baru.
+  // Ini untuk menghindari error jika 'globalApiKey' dari Database ternyata berisi key lama/kadaluarsa.
   
-  const apiKey = (globalApiKey && globalApiKey.trim() !== "") ? globalApiKey : HARDCODED_API_KEY;
+  // const apiKey = (globalApiKey && globalApiKey.trim() !== "") ? globalApiKey : HARDCODED_API_KEY; 
+  const apiKey = HARDCODED_API_KEY; // <-- FORCE NEW KEY
   
-  if (globalApiKey) {
-    console.log("Menggunakan API Key dari DATABASE PUSAT (Global)");
-  } else {
-    console.log("Menggunakan API Key CADANGAN (Hardcoded)");
+  if (globalApiKey && globalApiKey !== HARDCODED_API_KEY) {
+    console.log("NOTE: Mengabaikan Key Database demi kestabilan, menggunakan Key Hardcoded Baru.");
   }
   
   if (!apiKey || apiKey.trim() === "") {
@@ -99,8 +98,7 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // FIX: Menggunakan Model Terbaru 'gemini-3-flash-preview'
-      // Model ini lebih stabil untuk Production dan sesuai dengan API Restriction "Generative Language API"
+      // Menggunakan Model 'gemini-3-flash-preview'
       chatSession = ai.chats.create({
         model: 'gemini-3-flash-preview', 
         config: {
@@ -109,7 +107,7 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview)");
+      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview) with Key:", apiKey.substring(0, 8) + "...");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
