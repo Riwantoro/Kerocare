@@ -5,7 +5,7 @@ import { EmoteType } from "../types";
 // KONFIGURASI API KEY (FALLBACK)
 // =============================================================================================
 // Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
-// UPDATE: Menggunakan Key baru (Update Terbaru).
+// UPDATE: Menggunakan Key baru yang Anda berikan.
 const HARDCODED_API_KEY = "AIzaSyBNyD0fQ8nq9Wv1gARUBsLoPvm7bM_eGR0"; 
 // =============================================================================================
 
@@ -99,8 +99,9 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
+      // UPDATE: Menggunakan model 'gemini-2.0-flash' yang lebih stabil daripada versi 'exp'
       chatSession = ai.chats.create({
-        model: 'gemini-2.0-flash-exp', 
+        model: 'gemini-2.0-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
@@ -156,8 +157,14 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala. Mohon coba beberapa saat lagi.";
     const errString = error.toString().toLowerCase();
+    
+    // Deteksi error spesifik untuk debugging di console
     if (errString.includes("429") || errString.includes("quota")) {
       console.warn("Quota Exceeded Detected.");
+    } else if (errString.includes("404") || errString.includes("not found")) {
+      console.warn("Model AI tidak ditemukan. Coba ganti model.");
+    } else if (errString.includes("403") || errString.includes("permission")) {
+       console.warn("API Key tidak valid atau tidak memiliki akses.");
     }
 
     return { 
