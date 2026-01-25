@@ -1,6 +1,19 @@
 import { GoogleGenAI, Chat } from "@google/genai";
 import { EmoteType } from "../types";
 
+// =============================================================================================
+// KONFIGURASI API KEY
+// =============================================================================================
+// CARA 1 (Disarankan untuk Hosting/Vercel): 
+// Biarkan kosong, dan atur "API_KEY" di Environment Variables hosting Anda.
+//
+// CARA 2 (Untuk Testing Cepat/Lokal): 
+// Tempel API Key Google Gemini Anda di dalam tanda kutip di bawah ini.
+// Dapatkan key di: https://aistudio.google.com/
+const HARDCODED_API_KEY = "AIzaSyCW2QGvx-wY3hQFag0JF52jceEKcynh3zs"; 
+// Contoh: const HARDCODED_API_KEY = "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxx";
+// =============================================================================================
+
 const BASE_INSTRUCTION = `
 [Identitas]
 Nama kamu adalah "Sithem", asisten digital resmi Humas Lapas Kelas IIA Kerobokan, Bali.
@@ -55,10 +68,11 @@ Di akhir setiap respon, kamu WAJIB menyertakan tag emosi: [EMOTE: SMILE], [EMOTE
 let chatSession: Chat | null = null;
 
 export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
-  const apiKey = process.env.API_KEY;
+  // Logic to choose API Key: Environment Variable OR Hardcoded fallback
+  const apiKey = process.env.API_KEY || HARDCODED_API_KEY;
   
   // Prevent crash if API key is missing
-  if (!apiKey) {
+  if (!apiKey || apiKey.trim() === "") {
     console.warn("Gemini API Key is missing. Chat features will be disabled.");
     return null;
   }
@@ -92,10 +106,10 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     initializeChat(adminAnnouncement);
   }
 
-  // If still no session (e.g. missing API key), return fallback
+  // Check if session exists (indirectly checks if API Key was valid)
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key belum diatur). Silakan hubungi admin IT Lapas. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key belum diatur).\n\n**Untuk Pengembang:**\nSilakan buka file `services/geminiService.ts` dan tempel API Key Google Gemini Anda pada variabel `HARDCODED_API_KEY`. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
