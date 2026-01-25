@@ -44,7 +44,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tanya Bli Semut (Misal: Syarat kunjungan...)"
+            placeholder="Tanya Sithem (Misal: Syarat kunjungan...)"
             className="w-full bg-gray-100 border-0 rounded-2xl px-4 py-3 pr-12 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none overflow-hidden min-h-[50px] max-h-[120px]"
             rows={1}
             disabled={isLoading}
@@ -70,8 +70,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
       </form>
       <div className="text-center mt-3 px-2">
          <p className="text-[10px] text-gray-500 leading-tight">
-            Layanan ini gratis & bebas pungli. Hubungi WhatsApp Pengaduan (0811 3988 664) jika ada kendala.
-            <br/><span className="font-semibold text-slate-600 mt-1 inline-block">Kalapas Kerobokan, Hudi Ismono</span>
+            Layanan ini gratis & bebas pungli.
          </p>
       </div>
     </div>

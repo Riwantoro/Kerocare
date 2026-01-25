@@ -32,8 +32,8 @@ const App: React.FC = () => {
     initializeChat(announcement);
     
     const greetingText = announcement 
-      ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Bli Semut**, ada yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
-      : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Bli Semut**. Sesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
+      ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, ada yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
+      : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**. Sesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
 
     setMessages([
       {
@@ -118,7 +118,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="z-10 text-center mb-4 w-full">
-            <h2 className="text-xl font-bold text-yellow-400">Bli Semut</h2>
+            <h2 className="text-xl font-bold text-yellow-400">Sithem</h2>
             <p className="text-sm text-blue-100 opacity-90">Asisten Digital Humas</p>
             <div className="mt-4 flex gap-2 justify-center mb-6">
                <span className="px-3 py-1 bg-white/10 rounded-full text-xs backdrop-blur-sm border border-white/20 shadow-inner">Gratis</span>
@@ -142,7 +142,7 @@ const App: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="font-bold text-lg">Tentang Bli Semut</h2>
+                <h2 className="font-bold text-lg">Tentang Sithem</h2>
                 <button onClick={() => setIsMobileInfoOpen(false)} className="text-white/80 hover:text-white">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -155,7 +155,7 @@ const App: React.FC = () => {
                     <img src={LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
                  </div>
                  <Mascot emote={currentEmote} />
-                 <h3 className="text-xl font-bold text-yellow-400 mt-4">Bli Semut</h3>
+                 <h3 className="text-xl font-bold text-yellow-400 mt-4">Sithem</h3>
                  <p className="text-xs text-blue-200 mt-1">Lapas Kelas IIA Kerobokan</p>
                  <div className="mt-6 space-y-3 w-full">
                     <div className="bg-white/10 p-3 rounded-lg text-sm border border-white/5 shadow-md">
