@@ -1,62 +1,83 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Message, Sender } from '../types';
 
 interface ChatBubbleProps {
   message: Message;
 }
 
-const SITHEM_AVATAR = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
+const SITHEM_FULL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
   const isUser = message.sender === Sender.USER;
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation on mount
+    setAnimateIn(true);
+  }, []);
 
   // Simple formatter to handle bold text from markdown (**text**)
   const formatText = (text: string) => {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={index} className="font-bold">{part.slice(2, -2)}</strong>;
+        return <strong key={index} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>;
       }
       return part;
     });
   };
 
-  return (
-    <div className={`flex w-full gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fade-in-up group`}>
-      
-      {/* Avatar */}
-      <div className="flex-shrink-0 flex flex-col justify-end">
-        <div className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-md overflow-hidden border-2 ${isUser ? 'bg-blue-100 border-white' : 'bg-slate-900 border-yellow-500'}`}>
-          {isUser ? (
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6 text-blue-600">
-               <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-             </svg>
-          ) : (
-             <img src={SITHEM_AVATAR} alt="Bot" className="w-full h-full object-contain p-0.5" />
-          )}
-        </div>
-      </div>
-
-      {/* Bubble */}
-      <div
-        className={`relative max-w-[85%] md:max-w-[70%] rounded-2xl px-5 py-3.5 shadow-sm text-sm md:text-base leading-relaxed transition-transform duration-200 hover:-translate-y-0.5 ${
-          isUser
-            ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-none shadow-blue-200/50'
-            : 'bg-white text-slate-700 border border-gray-100 rounded-tl-none shadow-gray-200/50'
-        }`}
-      >
-        <p className="whitespace-pre-wrap tracking-wide">{formatText(message.text)}</p>
-        
-        {/* Timestamp & Info */}
-        <div className={`flex items-center gap-1 mt-1.5 ${isUser ? 'justify-end text-blue-100/80' : 'justify-start text-gray-400'}`}>
-           <span className="text-[10px] font-medium">
-            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-           </span>
-           {isUser && (
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+  if (isUser) {
+    return (
+      <div className={`flex w-full justify-end pl-10 mb-2 transition-all duration-500 transform ${animateIn ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div className="relative max-w-[90%] bg-gradient-to-br from-blue-600 to-blue-500 text-white px-5 py-3 rounded-2xl rounded-tr-sm shadow-lg shadow-blue-500/20">
+          <p className="text-sm leading-relaxed font-light tracking-wide">{message.text}</p>
+          <div className="flex items-center justify-end gap-1 mt-1 opacity-70">
+            <span className="text-[10px]">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
              </svg>
-           )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // BOT LAYOUT (The "Surprise" Layout)
+  return (
+    <div className={`relative flex w-full mt-6 mb-4 transition-all duration-500 transform ${animateIn ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'}`}>
+      
+      {/* 3D Mascot Pop-out Container */}
+      <div className="absolute -left-3 -bottom-5 z-20 w-20 h-20 md:w-24 md:h-24 filter drop-shadow-xl pointer-events-none">
+         {/* The Mascot Image */}
+         <img 
+            src={SITHEM_FULL} 
+            alt="Sithem" 
+            className="w-full h-full object-contain animate-blob"
+            style={{ animationDuration: '6s' }} 
+         />
+      </div>
+
+      {/* The Bubble */}
+      <div className="ml-14 md:ml-16 max-w-[85%] relative z-10">
+        {/* Little triangle pointing to mascot */}
+        <div className="absolute top-4 -left-2 w-4 h-4 bg-white transform rotate-45 border-l border-b border-gray-100"></div>
+        
+        <div className="bg-white border border-gray-100 text-slate-600 px-5 py-4 rounded-2xl rounded-tl-none shadow-[0_8px_20px_-6px_rgba(0,0,0,0.1)] group hover:shadow-lg transition-shadow duration-300">
+          
+          {/* Header in Bubble */}
+          <div className="flex items-center gap-2 mb-2 border-b border-gray-100 pb-2">
+             <span className="text-[10px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Sithem</span>
+             <span className="text-[10px] text-gray-400">Asisten Humas</span>
+          </div>
+
+          <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap text-slate-700">
+            {formatText(message.text)}
+          </p>
+          
+          <div className="mt-2 text-[10px] text-gray-400 font-medium text-right">
+             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
       </div>
     </div>

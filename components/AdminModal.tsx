@@ -21,7 +21,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') { // Simple hardcoded password for demo
+    if (password === 'Kiki1810') { // Updated password
       setIsAuthenticated(true);
       setError('');
     } else {

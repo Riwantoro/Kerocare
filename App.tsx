@@ -8,6 +8,7 @@ import AdminModal from './components/AdminModal';
 
 // Updated Logo Kementerian Imigrasi dan Pemasyarakatan
 export const LOGO_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353691/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan__2024_1_ihjxaz.png";
+const SITHEM_IMG_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -240,20 +241,27 @@ const App: React.FC = () => {
              {messages.map((msg) => (
                <ChatBubble key={msg.id} message={msg} />
              ))}
+             
+             {/* Thinking Animation (New "Surprise" Style) */}
              {isLoading && (
-               <div className="flex justify-start animate-fade-in-up">
-                  <div className="flex items-end gap-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 border border-yellow-500/30 flex items-center justify-center p-1 overflow-hidden">
-                        <img src="https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg" alt="Bot" className="w-full h-full object-contain" />
-                    </div>
-                    <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex items-center space-x-1 h-[46px]">
-                       <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                       <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
-                       <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-300"></div>
-                    </div>
+               <div className="flex w-full mt-6 mb-4 animate-fade-in-up">
+                  <div className="relative">
+                     {/* Bouncing Sithem */}
+                     <div className="w-16 h-16 md:w-20 md:h-20 animate-bounce">
+                        <img 
+                           src={SITHEM_IMG_URL} 
+                           alt="Thinking..." 
+                           className="w-full h-full object-contain filter drop-shadow-lg"
+                        />
+                     </div>
+                     {/* Thought Cloud */}
+                     <div className="absolute -top-6 -right-12 bg-white px-3 py-2 rounded-xl rounded-bl-none shadow-md border border-gray-200 animate-pulse">
+                        <p className="text-xs text-slate-500 italic">Sedang mengetik...</p>
+                     </div>
                   </div>
                </div>
              )}
+
              <div ref={messagesEndRef} />
           </div>
 
