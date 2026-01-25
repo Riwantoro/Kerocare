@@ -38,7 +38,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-slate-800 text-white p-4 flex justify-between items-center">
-          <h2 className="font-bold text-lg">Admin Panel Bli Semut</h2>
+          <h2 className="font-bold text-lg">Admin Panel Sithem</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -69,7 +69,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
             <div className="space-y-4">
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
                 <p className="text-xs text-yellow-800">
-                  <strong>Info:</strong> Teks yang Anda tulis di sini akan menjadi prioritas Bli Semut. Gunakan untuk info libur mendadak, perubahan jam layanan, dll. Kosongkan jika operasional normal.
+                  <strong>Info:</strong> Teks yang Anda tulis di sini akan menjadi prioritas Sithem. Gunakan untuk info libur mendadak, perubahan jam layanan, dll. Kosongkan jika operasional normal.
                 </p>
               </div>
               <div>

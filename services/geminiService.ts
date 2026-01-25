@@ -54,35 +54,53 @@ Di akhir setiap respon, kamu WAJIB menyertakan tag emosi: [EMOTE: SMILE], [EMOTE
 
 let chatSession: Chat | null = null;
 
-export const initializeChat = (adminAnnouncement: string = ""): Chat => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
+  const apiKey = process.env.API_KEY;
   
-  // Inject admin announcement into the system instruction if it exists
-  let finalInstruction = BASE_INSTRUCTION;
-  if (adminAnnouncement && adminAnnouncement.trim() !== "") {
-    finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
+  // Prevent crash if API key is missing
+  if (!apiKey) {
+    console.warn("Gemini API Key is missing. Chat features will be disabled.");
+    return null;
   }
 
-  chatSession = ai.chats.create({
-    model: 'gemini-3-flash-preview',
-    config: {
-      systemInstruction: finalInstruction,
-      temperature: 0.7,
-    },
-  });
-  return chatSession;
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    
+    // Inject admin announcement into the system instruction if it exists
+    let finalInstruction = BASE_INSTRUCTION;
+    if (adminAnnouncement && adminAnnouncement.trim() !== "") {
+      finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
+    }
+
+    chatSession = ai.chats.create({
+      model: 'gemini-3-flash-preview',
+      config: {
+        systemInstruction: finalInstruction,
+        temperature: 0.7,
+      },
+    });
+    return chatSession;
+  } catch (error) {
+    console.error("Failed to initialize Gemini:", error);
+    return null;
+  }
 };
 
 export const sendMessageToGemini = async (message: string, adminAnnouncement: string = ""): Promise<{ text: string; emote: EmoteType }> => {
-  // Always ensure session exists, potentially re-initializing if needed logic handled by App component usually, 
-  // but here we check existence.
+  // Try to initialize if not exists
   if (!chatSession) {
     initializeChat(adminAnnouncement);
   }
 
+  // If still no session (e.g. missing API key), return fallback
+  if (!chatSession) {
+    return {
+      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key belum diatur). Silakan hubungi admin IT Lapas. [EMOTE: BOW]",
+      emote: EmoteType.BOW
+    };
+  }
+
   try {
-    if (!chatSession) throw new Error("Chat session not initialized");
-    
     const result = await chatSession.sendMessage({ message });
     const rawText = result.text || "";
 
