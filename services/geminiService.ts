@@ -6,7 +6,7 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // Kunci bawaan (Fallback).
 // Jika kuota habis, user bisa memasukkan key sendiri via Admin Panel.
-const HARDCODED_API_KEY = "AIzaSyCW2QGvx-wY3hQFag0JF52jceEKcynh3zs"; 
+const HARDCODED_API_KEY = "AIzaSyAxiPtWF_jemX9OkrNf4VO6q1IsNJpglZg"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -115,7 +115,7 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
   // Check if session exists (indirectly checks if API Key was valid during init)
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key kosong).\n\n**Info:** Masuk ke menu Admin (klik 'Admin Login' di menu) dan masukkan API Key Google Gemini yang valid pada kolom konfigurasi. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem. Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
@@ -147,14 +147,13 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    let errorMessage = "Mohon maaf Gek/Bli, sistem Sithem sedang ada gangguan sinyal.";
+    // Default friendly maintenance message
+    let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala untuk meningkatkan kualitas layanan. Mohon coba beberapa saat lagi. Suksma.";
     
-    // Deteksi Error Umum
+    // Log teknis tetap ada di console untuk developer, tapi user hanya lihat pesan ramah
     const errString = error.toString().toLowerCase();
     if (errString.includes("429") || errString.includes("quota")) {
-      errorMessage = "Mohon maaf, **Kuota API Key Harian Habis**. \n\nSilakan lapor ke Admin untuk mengganti API Key di panel Admin, atau coba lagi besok.";
-    } else if (errString.includes("400") || errString.includes("key") || errString.includes("permission")) {
-      errorMessage = "Mohon maaf, **API Key Tidak Valid/Kedaluwarsa**. \n\nSilakan update API Key di menu Admin Login.";
+      console.warn("Quota Exceeded Detected - Displaying Maintenance Message");
     }
 
     return { 

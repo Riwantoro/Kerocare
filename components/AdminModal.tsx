@@ -47,10 +47,13 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
       localStorage.removeItem('kero_gemini_api_key');
     }
 
-    // Reset Chat Session to force reconnection with new settings
+    // Reset Chat Session
     resetSession();
     
     onClose();
+
+    // RELOAD PAGE to ensure new Key is applied immediately
+    window.location.reload();
   };
 
   return (
@@ -114,7 +117,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
                    <label className="block text-xs font-bold text-gray-700 uppercase">Konfigurasi AI (API Key)</label>
                 </div>
                 <p className="text-[10px] text-gray-500 mb-2">
-                  Jika chat mengalami error "Gangguan Sinyal" atau "Limit", masukkan <strong>Google Gemini API Key</strong> baru di sini. 
+                  Jika chat mengalami error "Pemeliharaan", masukkan <strong>Google Gemini API Key</strong> baru di sini. 
                   <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline ml-1">Buat API Key di sini</a>.
                 </p>
                 <input 
@@ -128,11 +131,11 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
 
               {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
-                <button onClick={() => { setText(''); onSave(''); onClose(); }} className="flex-1 border border-red-200 text-red-600 py-2 rounded-lg font-bold hover:bg-red-50 transition text-sm">
+                <button onClick={() => { setText(''); onSave(''); onClose(); window.location.reload(); }} className="flex-1 border border-red-200 text-red-600 py-2 rounded-lg font-bold hover:bg-red-50 transition text-sm">
                   Reset Pesan
                 </button>
                 <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition text-sm">
-                  Simpan Semua
+                  Simpan & Refresh
                 </button>
               </div>
             </div>
