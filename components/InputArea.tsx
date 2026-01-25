@@ -68,8 +68,11 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
           )}
         </button>
       </form>
-      <div className="text-center mt-2">
-         <p className="text-[10px] text-gray-400">Layanan ini gratis & bebas pungli. Hubungi petugas jika ada kendala.</p>
+      <div className="text-center mt-3 px-2">
+         <p className="text-[10px] text-gray-500 leading-tight">
+            Layanan ini gratis & bebas pungli. Hubungi WhatsApp Pengaduan (0811 3988 664) jika ada kendala.
+            <br/><span className="font-semibold text-slate-600 mt-1 inline-block">Kalapas Kerobokan, Hudi Ismono</span>
+         </p>
       </div>
     </div>
   );
