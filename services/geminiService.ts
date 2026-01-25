@@ -2,10 +2,10 @@ import { GoogleGenAI, Chat } from "@google/genai";
 import { EmoteType } from "../types";
 
 // =============================================================================================
-// KONFIGURASI API KEY
+// KONFIGURASI API KEY (GLOBAL)
 // =============================================================================================
-// Kunci bawaan (Fallback).
-// Jika kuota habis, user bisa memasukkan key sendiri via Admin Panel.
+// Key ini ditanam di kode agar berlaku untuk SEMUA PENGUNJUNG.
+// Update terakhir: Menggunakan Key baru dari Admin.
 const HARDCODED_API_KEY = "AIzaSyBMrRxQgSftwOs759tYqO8TYmq7BABxJCs"; 
 // =============================================================================================
 
@@ -71,18 +71,15 @@ export const resetSession = () => {
 
 export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
   // Logic Prioritas API Key:
-  // 1. LocalStorage (Settingan Admin User)
+  // 1. LocalStorage (HANYA BERLAKU DI PERANGKAT INI - Debugging/Admin Device)
   // 2. Environment Variable
-  // 3. Hardcoded (Fallback)
+  // 3. Hardcoded (DEFAULT GLOBAL - Berlaku untuk semua pengunjung)
   const localKey = typeof window !== 'undefined' ? localStorage.getItem('kero_gemini_api_key') : null;
   
-  // Debug log untuk memastikan key mana yang dipakai
   if (localKey) {
-    console.log("Menggunakan API Key dari Konfigurasi Admin (LocalStorage)");
-  } else {
-    console.log("Menggunakan API Key Hardcoded (System Default)");
+    console.log("Using LOCAL OVERRIDE API Key (Admin Device Only)");
   }
-
+  
   const apiKey = localKey || process.env.API_KEY || HARDCODED_API_KEY;
   
   // Prevent crash if API key is missing
@@ -100,9 +97,7 @@ export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
       finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
     }
 
-    // ALTERNATIF SOLUSI: Menggunakan model 'gemini-2.0-flash-exp'
-    // Model experimental 2.0 biasanya lebih cepat dan kuotanya terpisah dari versi produksi,
-    // sehingga meminimalisir kemungkinan kena limit '429 Quota Exceeded'.
+    // Menggunakan model 'gemini-2.0-flash-exp' untuk stabilitas kuota yang lebih baik
     chatSession = ai.chats.create({
       model: 'gemini-2.0-flash-exp', 
       config: {
@@ -123,7 +118,6 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     initializeChat(adminAnnouncement);
   }
 
-  // Check if session exists (indirectly checks if API Key was valid during init)
   if (!chatSession) {
     return {
       text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem. Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
@@ -159,12 +153,11 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     console.error("Gemini Error:", error);
     
     // Default friendly maintenance message
-    let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala untuk meningkatkan kualitas layanan. Mohon coba beberapa saat lagi. Suksma.";
+    let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala. Mohon coba beberapa saat lagi.";
     
-    // Log teknis tetap ada di console untuk developer, tapi user hanya lihat pesan ramah
     const errString = error.toString().toLowerCase();
     if (errString.includes("429") || errString.includes("quota")) {
-      console.warn("Quota Exceeded Detected - Displaying Maintenance Message");
+      console.warn("Quota Exceeded Detected.");
     }
 
     return { 

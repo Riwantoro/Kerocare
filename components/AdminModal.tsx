@@ -116,16 +116,26 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
                    <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
                    <label className="block text-xs font-bold text-gray-700 uppercase">Konfigurasi AI (API Key)</label>
                 </div>
-                <p className="text-[10px] text-gray-500 mb-2">
-                  Jika chat mengalami error "Pemeliharaan", masukkan <strong>Google Gemini API Key</strong> baru di sini. 
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline ml-1">Buat API Key di sini</a>.
-                </p>
+                <div className="bg-red-50 border border-red-200 p-3 rounded-lg mb-2">
+                  <p className="text-[10px] font-bold text-red-800 flex items-start gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 flex-shrink-0 mt-0.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    PENTING:
+                  </p>
+                  <p className="text-[10px] text-red-700 mt-1">
+                    Key yang diinput di sini <strong>HANYA TERSIMPAN DI BROWSER INI</strong> (Local Storage). Pengunjung lain TIDAK akan otomatis mendapatkan Key ini.
+                  </p>
+                  <p className="text-[10px] text-red-700 mt-1">
+                    Fitur ini hanya untuk testing Admin saat Key utama limit. Untuk mengganti Key secara GLOBAL, silakan hubungi Developer untuk update kode aplikasi.
+                  </p>
+                </div>
                 <input 
                   type="password" 
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg p-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Paste API Key Gemini Anda di sini..."
+                  placeholder="Paste API Key di sini (Hanya untuk perangkat ini)..."
                 />
               </div>
 
@@ -135,7 +145,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
                   Reset Pesan
                 </button>
                 <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition text-sm">
-                  Simpan & Refresh
+                  Simpan Lokal
                 </button>
               </div>
             </div>
