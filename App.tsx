@@ -166,7 +166,7 @@ const App: React.FC = () => {
 
         {/* Mobile Info Drawer (Overlay) */}
         {isMobileInfoOpen && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden flex justify-end transition-opacity" onClick={() => setIsMobileInfoOpen(false)}>
+          <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden flex justify-end transition-opacity" onClick={() => setIsMobileInfoOpen(false)}>
             <div 
               className="w-4/5 max-w-xs h-full bg-[#1a1a1a] text-white p-6 shadow-2xl flex flex-col animate-slide-in-right border-l border-yellow-500/30 relative overflow-hidden"
               onClick={(e) => e.stopPropagation()}
@@ -220,36 +220,47 @@ const App: React.FC = () => {
         {/* Right Panel: Chat Interface */}
         <div className="w-full md:w-2/3 flex flex-col h-full relative">
           
-          {/* Mobile Background (Balinese Pattern) */}
-          <div className="md:hidden absolute inset-0 z-0 bg-slate-50">
-             {/* Gradient Base */}
-             <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-slate-200"></div>
-             {/* Balinese Pattern Texture */}
-             <div className="absolute inset-0 opacity-[0.07]" style={{ 
-                backgroundImage: `url("https://www.transparenttextures.com/patterns/black-scales.png")`,
-                backgroundSize: '40px'
+          {/* Mobile Background (Engaging Gradient + Pattern) */}
+          <div className="md:hidden absolute inset-0 z-0 bg-slate-50 overflow-hidden">
+             {/* Base Gradient */}
+             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-slate-50 to-yellow-50/50"></div>
+             
+             {/* Animated Blobs for depth */}
+             <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl animate-blob"></div>
+             <div className="absolute top-40 -left-20 w-72 h-72 bg-yellow-200/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+             
+             {/* Subtle Texture Overlay */}
+             <div className="absolute inset-0 opacity-[0.03]" style={{ 
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230f172a' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                backgroundSize: '20px 20px'
              }}></div>
           </div>
 
-          {/* Header Mobile Only (Modern + Balinese Touch) */}
-          <div className="md:hidden bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-yellow-600/50 flex items-center justify-between shadow-lg sticky top-0 z-20">
-            <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-yellow-500/50 shadow-sm p-1">
-                  <img src="https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg" alt="Sithem" className="w-full h-full object-contain" />
+          {/* Sticky Header Mobile (Official & Modern) */}
+          <div className="md:hidden bg-slate-900/95 backdrop-blur-xl px-4 py-3 border-b border-white/10 flex items-center justify-between shadow-lg sticky top-0 z-50 transition-all">
+             <div className="flex items-center gap-3">
+               <div className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 p-1.5">
+                  <img src={LOGO_URL} alt="Logo Kemenkumham" className="w-full h-full object-contain drop-shadow-sm" />
                </div>
-               <div>
-                <h1 className="font-bold text-white leading-tight text-sm tracking-wide">KERO-CARE</h1>
-                <p className="text-[10px] text-yellow-400 font-medium">Lapas Kerobokan</p>
+               <div className="flex flex-col">
+                  <h1 className="font-bold text-white text-sm tracking-wide leading-none">KERO-CARE</h1>
+                  <div className="flex items-center gap-1.5 mt-1">
+                     <span className="relative flex h-2 w-2">
+                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                     </span>
+                     <span className="text-[10px] text-slate-300 font-medium">Lapas Kelas IIA Kerobokan</span>
+                  </div>
                </div>
-            </div>
-            <button 
-              onClick={() => setIsMobileInfoOpen(true)}
-              className="p-2 text-yellow-400 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              </svg>
-            </button>
+             </div>
+             <button 
+                onClick={() => setIsMobileInfoOpen(true)}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-yellow-400 border border-white/5 transition-all active:scale-95"
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                   <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+             </button>
           </div>
           
           {/* Announcement Banner */}
