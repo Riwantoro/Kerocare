@@ -5,8 +5,8 @@ import { EmoteType } from "../types";
 // KONFIGURASI API KEY (FALLBACK)
 // =============================================================================================
 // Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
-// UPDATE: Menggunakan Key baru dari akun cadangan (Hardcoded Manual).
-const HARDCODED_API_KEY = "AIzaSyC1giXUCLPjCd8AW1aIGdQnMEsQD-SLnEI"; 
+// UPDATE: Menggunakan Key baru (Update Terbaru).
+const HARDCODED_API_KEY = "AIzaSyBNyD0fQ8nq9Wv1gARUBsLoPvm7bM_eGR0"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
