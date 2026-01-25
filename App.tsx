@@ -6,10 +6,8 @@ import InputArea from './components/InputArea';
 import Mascot from './components/Mascot';
 import AdminModal from './components/AdminModal';
 
-// Placeholder URL for the Ministry Logo. 
-// NOTE: Please replace this URL with the local path to your specific file (e.g., "/assets/logo-kementerian.png") 
-// if you have the exact file from the prompt. Using a high-res Coat of Arms proxy for now.
-export const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Emblem_of_the_Ministry_of_Law_and_Human_Rights_of_Indonesia.svg/240px-Emblem_of_the_Ministry_of_Law_and_Human_Rights_of_Indonesia.svg.png";
+// Updated Logo to "Logo Pemasyarakatan" which is the correct identity for Lapas under the new Ministry
+export const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_Pemasyarakatan.png/240px-Logo_Pemasyarakatan.png";
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
