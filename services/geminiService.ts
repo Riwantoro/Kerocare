@@ -99,16 +99,18 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // FIX: Menggunakan 'gemini-3-flash-preview' sesuai standar library terbaru untuk menghindari error 404
+      // CHANGE: Menggunakan 'gemini-2.0-flash' 
+      // 1.5-flash memberikan 404 (mungkin isu region/SDK), 3-flash-preview memberikan 403 (restricted).
+      // 2.0-flash biasanya penengah yang baik.
       chatSession = ai.chats.create({
-        model: 'gemini-3-flash-preview', 
+        model: 'gemini-2.0-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: 3-flash-preview)");
+      console.log("Gemini Session Initialized (Model: 2.0-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -166,11 +168,12 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
       console.warn("KUOTA HABIS. Silakan Admin ganti API Key via Admin Panel.");
       errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       console.warn("AKSES DITOLAK (403). Cek API Key Restrictions di Google AI Studio.");
-       errorMessage = "Mohon maaf, sistem keamanan menolak koneksi (Invalid Key/Restriction).";
+       const hostname = window.location.hostname;
+       console.warn(`AKSES DITOLAK (403). Domain '${hostname}' mungkin belum di-whitelist di Google AI Studio.`);
+       errorMessage = `Mohon maaf, akses dari website ini (${hostname}) belum diizinkan oleh sistem keamanan Pusat (Error 403). Mohon lapor ke Admin.`;
     } else if (errString.includes("404") || errString.includes("not found")) {
-       console.warn("MODEL TIDAK DITEMUKAN (404). Update model di kode.");
-       errorMessage = "Mohon maaf, sedang terjadi update sistem internal (Model AI). Mohon coba lagi nanti.";
+       console.warn("MODEL TIDAK DITEMUKAN (404).");
+       errorMessage = "Mohon maaf, sedang terjadi update sistem internal (Model AI Not Found). Mohon coba lagi nanti.";
     }
 
     return { 
