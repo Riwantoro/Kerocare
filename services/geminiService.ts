@@ -5,8 +5,8 @@ import { EmoteType } from "../types";
 // KONFIGURASI API KEY (FALLBACK)
 // =============================================================================================
 // Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
-// Diupdate agar sama dengan configService untuk memastikan akses lancar.
-const HARDCODED_API_KEY = "AIzaSyCoVrVO49TT9AYG9pNYxNcdDoewwMxYLw4"; 
+// Diupdate dengan Key Baru dari User.
+const HARDCODED_API_KEY = "AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -99,18 +99,17 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // CHANGE: Menggunakan 'gemini-2.0-flash' 
-      // 1.5-flash memberikan 404 (mungkin isu region/SDK), 3-flash-preview memberikan 403 (restricted).
-      // 2.0-flash biasanya penengah yang baik.
+      // FIX: Menggunakan Model Terbaru 'gemini-3-flash-preview'
+      // Model ini lebih stabil untuk Production dan sesuai dengan API Restriction "Generative Language API"
       chatSession = ai.chats.create({
-        model: 'gemini-2.0-flash', 
+        model: 'gemini-3-flash-preview', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: 2.0-flash)");
+      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -156,7 +155,11 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     return { text: cleanText, emote };
 
   } catch (error: any) {
-    console.error("Gemini Error Detail:", error);
+    // LOGGING LENGKAP UNTUK DEBUGGING DI CONSOLE BROWSER
+    console.error("=== GEMINI API ERROR ===");
+    console.error(error);
+    if (error.response) console.error("Response:", error.response);
+    console.error("========================");
     
     // Pesan Default
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
@@ -169,11 +172,11 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
       errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
        const hostname = window.location.hostname;
-       console.warn(`AKSES DITOLAK (403). Domain '${hostname}' mungkin belum di-whitelist di Google AI Studio.`);
-       errorMessage = `Mohon maaf, akses dari website ini (${hostname}) belum diizinkan oleh sistem keamanan Pusat (Error 403). Mohon lapor ke Admin.`;
+       console.warn(`AKSES DITOLAK (403). Cek Google Cloud Console > APIs & Services > Credentials.`);
+       errorMessage = `Mohon maaf, sistem keamanan menolak koneksi (Error 403). Pastikan domain ${hostname} sudah di-whitelist di Google Console.`;
     } else if (errString.includes("404") || errString.includes("not found")) {
        console.warn("MODEL TIDAK DITEMUKAN (404).");
-       errorMessage = "Mohon maaf, sedang terjadi update sistem internal (Model AI Not Found). Mohon coba lagi nanti.";
+       errorMessage = "Mohon maaf, layanan AI belum aktif di akun Google Cloud Admin (Error 404).";
     }
 
     return { 
