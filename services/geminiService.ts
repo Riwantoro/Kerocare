@@ -5,7 +5,8 @@ import { EmoteType } from "../types";
 // KONFIGURASI API KEY (FALLBACK)
 // =============================================================================================
 // Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
-const HARDCODED_API_KEY = "AIzaSyBNyD0fQ8nq9Wv1gARUBsLoPvm7bM_eGR0"; 
+// Diupdate agar sama dengan configService untuk memastikan akses lancar.
+const HARDCODED_API_KEY = "AIzaSyCoVrVO49TT9AYG9pNYxNcdDoewwMxYLw4"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -98,15 +99,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Gunakan model stabil 'gemini-2.0-flash' untuk production
+      // FIX: Menggunakan 'gemini-3-flash-preview' sesuai standar library terbaru untuk menghindari error 404
       chatSession = ai.chats.create({
-        model: 'gemini-2.0-flash', 
+        model: 'gemini-3-flash-preview', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
+      console.log("Gemini Session Initialized (Model: 3-flash-preview)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -123,7 +125,7 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
 
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem. Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem (Koneksi Database). Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
@@ -155,18 +157,20 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     console.error("Gemini Error Detail:", error);
     
     // Pesan Default
-    let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala. Mohon coba beberapa saat lagi.";
+    let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
     
     // Analisa Error untuk Debugging Pengguna
     const errString = error.toString().toLowerCase();
     
     if (errString.includes("429") || errString.includes("quota")) {
       console.warn("KUOTA HABIS. Silakan Admin ganti API Key via Admin Panel.");
-    } else if (errString.includes("404") || errString.includes("not found")) {
-      console.warn("Model AI tidak ditemukan.");
+      errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       console.warn("AKSES DITOLAK (403). API Key mungkin salah atau diblokir.");
-       errorMessage = "Mohon maaf, koneksi ke sistem keamanan terblokir. Admin sedang melakukan perbaikan.";
+       console.warn("AKSES DITOLAK (403). Cek API Key Restrictions di Google AI Studio.");
+       errorMessage = "Mohon maaf, sistem keamanan menolak koneksi (Invalid Key/Restriction).";
+    } else if (errString.includes("404") || errString.includes("not found")) {
+       console.warn("MODEL TIDAK DITEMUKAN (404). Update model di kode.");
+       errorMessage = "Mohon maaf, sedang terjadi update sistem internal (Model AI). Mohon coba lagi nanti.";
     }
 
     return { 
