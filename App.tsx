@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Message, Sender, EmoteType } from './types';
 import { initializeChat, sendMessageToGemini } from './services/geminiService';
+import { subscribeToConfig, updateGlobalConfig } from './services/configService';
 import ChatBubble from './components/ChatBubble';
 import InputArea from './components/InputArea';
 import Mascot from './components/Mascot';
 import AdminModal from './components/AdminModal';
 
-// Updated Logo Kementerian Imigrasi dan Pemasyarakatan
 export const LOGO_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353691/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan__2024_1_ihjxaz.png";
 const SITHEM_IMG_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
 
@@ -16,37 +16,62 @@ const App: React.FC = () => {
   const [currentEmote, setCurrentEmote] = useState<EmoteType>(EmoteType.SMILE);
   const [isMobileInfoOpen, setIsMobileInfoOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  
+  // State for Global Config
   const [announcement, setAnnouncement] = useState('');
+  const [globalApiKey, setGlobalApiKey] = useState('');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Subscribe to Global Database (Firebase)
   useEffect(() => {
-    const savedAnnouncement = localStorage.getItem('kero_announcement');
-    if (savedAnnouncement) {
-      setAnnouncement(savedAnnouncement);
-    }
+    // 1. Load from LocalStorage first (for instant load/cache)
+    const cachedAnnouncement = localStorage.getItem('kero_announcement');
+    if (cachedAnnouncement) setAnnouncement(cachedAnnouncement);
+
+    // 2. Subscribe to Realtime Database
+    const unsubscribe = subscribeToConfig((data) => {
+      console.log("Menerima Update Global:", data);
+      
+      // Update State
+      if (data.announcement !== undefined) {
+        setAnnouncement(data.announcement);
+        localStorage.setItem('kero_announcement', data.announcement); // Sync local cache
+      }
+      if (data.geminiApiKey !== undefined) {
+        setGlobalApiKey(data.geminiApiKey);
+      }
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
+  // Re-initialize Chat whenever announcement or API key changes
   useEffect(() => {
-    initializeChat(announcement);
+    initializeChat(announcement, globalApiKey);
     
-    const greetingText = announcement 
-      ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, ada yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
-      : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**. Sesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
+    // Only set initial greeting if chat is empty
+    if (messages.length === 0) {
+        const greetingText = announcement 
+          ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, ada yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
+          : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**. Sesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
 
-    setMessages([
-      {
-        id: 'init-1',
-        text: greetingText,
-        sender: Sender.BOT,
-        timestamp: new Date(),
-      }
-    ]);
-  }, [announcement]);
+        setMessages([
+          {
+            id: 'init-1',
+            text: greetingText,
+            sender: Sender.BOT,
+            timestamp: new Date(),
+          }
+        ]);
+    }
+  }, [announcement, globalApiKey]);
 
-  const handleSaveAnnouncement = (text: string) => {
-    setAnnouncement(text);
-    localStorage.setItem('kero_announcement', text);
+  // Handle saving from Admin Modal (Writes to Firebase)
+  const handleSaveConfig = (newAnnouncement: string, newApiKey: string) => {
+    updateGlobalConfig(newAnnouncement, newApiKey);
   };
 
   const scrollToBottom = () => {
@@ -68,7 +93,8 @@ const App: React.FC = () => {
     setIsLoading(true);
     setCurrentEmote(EmoteType.NEUTRAL); 
 
-    const response = await sendMessageToGemini(text, announcement);
+    // Pass the globalApiKey to the service
+    const response = await sendMessageToGemini(text, announcement, globalApiKey);
 
     const botMsg: Message = {
       id: (Date.now() + 1).toString(),
@@ -89,7 +115,8 @@ const App: React.FC = () => {
         isOpen={isAdminModalOpen} 
         onClose={() => setIsAdminModalOpen(false)} 
         currentAnnouncement={announcement}
-        onSave={handleSaveAnnouncement}
+        currentApiKey={globalApiKey}
+        onSave={handleSaveConfig}
       />
 
       {/* Desktop Background Decor */}

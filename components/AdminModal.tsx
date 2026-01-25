@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { resetSession } from '../services/geminiService';
 
 interface AdminModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentAnnouncement: string;
-  onSave: (text: string) => void;
+  currentApiKey: string;
+  onSave: (announcement: string, apiKey: string) => void;
 }
 
-const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnouncement, onSave }) => {
+const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnouncement, currentApiKey, onSave }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [text, setText] = useState(currentAnnouncement);
+  const [text, setText] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
 
-  // Load existing data
+  // Load existing data when modal opens
   useEffect(() => {
-    setText(currentAnnouncement);
     if (isOpen) {
-      const storedKey = localStorage.getItem('kero_gemini_api_key');
-      if (storedKey) setApiKey(storedKey);
+      setText(currentAnnouncement);
+      setApiKey(currentApiKey);
     }
-  }, [currentAnnouncement, isOpen]);
+  }, [isOpen, currentAnnouncement, currentApiKey]);
 
   if (!isOpen) return null;
 
@@ -37,30 +36,15 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
   };
 
   const handleSave = () => {
-    // Save Announcement
-    onSave(text);
-    
-    // Save API Key
-    if (apiKey.trim()) {
-      localStorage.setItem('kero_gemini_api_key', apiKey.trim());
-    } else {
-      localStorage.removeItem('kero_gemini_api_key');
-    }
-
-    // Reset Chat Session
-    resetSession();
-    
+    onSave(text, apiKey.trim());
     onClose();
-
-    // RELOAD PAGE to ensure new Key is applied immediately
-    window.location.reload();
   };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
         <div className="bg-slate-800 text-white p-4 flex justify-between items-center flex-shrink-0">
-          <h2 className="font-bold text-lg">Admin Panel Sithem</h2>
+          <h2 className="font-bold text-lg">Admin Panel (Database Pusat)</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -71,7 +55,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
         <div className="p-6 overflow-y-auto">
           {!isAuthenticated ? (
             <form onSubmit={handleLogin} className="space-y-4">
-              <p className="text-sm text-gray-600">Masukkan password admin untuk mengubah informasi operasional atau konfigurasi sistem.</p>
+              <p className="text-sm text-gray-600">Masukkan password admin untuk mengubah konfigurasi GLOBAL yang berlaku untuk semua pengunjung.</p>
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
                 <input 
@@ -93,11 +77,11 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-1">
                    <div className="w-1 h-4 bg-yellow-500 rounded-full"></div>
-                   <label className="block text-xs font-bold text-gray-700 uppercase">Pengumuman / Jadwal</label>
+                   <label className="block text-xs font-bold text-gray-700 uppercase">Pengumuman / Jadwal (Global)</label>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mb-2">
                   <p className="text-[10px] text-yellow-800">
-                    Teks di sini akan menjadi prioritas Sithem. Gunakan untuk info libur atau perubahan jam layanan.
+                    Semua HP pengunjung yang sedang membuka aplikasi akan langsung melihat pesan ini (Realtime).
                   </p>
                 </div>
                 <textarea 
@@ -114,20 +98,14 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-1">
                    <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
-                   <label className="block text-xs font-bold text-gray-700 uppercase">Konfigurasi AI (API Key)</label>
+                   <label className="block text-xs font-bold text-gray-700 uppercase">Ganti API Key AI (Global)</label>
                 </div>
-                <div className="bg-red-50 border border-red-200 p-3 rounded-lg mb-2">
-                  <p className="text-[10px] font-bold text-red-800 flex items-start gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 flex-shrink-0 mt-0.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                    </svg>
-                    PENTING:
+                <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-2">
+                  <p className="text-[10px] font-bold text-blue-800">
+                    Efek Global ke Semua User
                   </p>
-                  <p className="text-[10px] text-red-700 mt-1">
-                    Key yang diinput di sini <strong>HANYA TERSIMPAN DI BROWSER INI</strong> (Local Storage). Pengunjung lain TIDAK akan otomatis mendapatkan Key ini.
-                  </p>
-                  <p className="text-[10px] text-red-700 mt-1">
-                    Fitur ini hanya untuk testing Admin saat Key utama limit. Untuk mengganti Key secara GLOBAL, silakan hubungi Developer untuk update kode aplikasi.
+                  <p className="text-[10px] text-blue-700 mt-1">
+                    Jika kuota habis, ganti key di sini. Key akan disimpan di Database Pusat dan semua user otomatis menggunakan key baru ini.
                   </p>
                 </div>
                 <input 
@@ -135,17 +113,20 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, currentAnnounc
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg p-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Paste API Key di sini (Hanya untuk perangkat ini)..."
+                  placeholder="Paste API Key Baru..."
                 />
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
-                <button onClick={() => { setText(''); onSave(''); onClose(); window.location.reload(); }} className="flex-1 border border-red-200 text-red-600 py-2 rounded-lg font-bold hover:bg-red-50 transition text-sm">
-                  Reset Pesan
+                <button onClick={() => { setText(''); onSave('', apiKey); onClose(); }} className="flex-1 border border-red-200 text-red-600 py-2 rounded-lg font-bold hover:bg-red-50 transition text-sm">
+                  Hapus Pengumuman
                 </button>
-                <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition text-sm">
-                  Simpan Lokal
+                <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition text-sm flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                   </svg>
+                  Simpan ke Pusat
                 </button>
               </div>
             </div>

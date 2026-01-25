@@ -2,11 +2,11 @@ import { GoogleGenAI, Chat } from "@google/genai";
 import { EmoteType } from "../types";
 
 // =============================================================================================
-// KONFIGURASI API KEY (GLOBAL)
+// KONFIGURASI API KEY (FALLBACK)
 // =============================================================================================
-// Key ini ditanam di kode agar berlaku untuk SEMUA PENGUNJUNG.
-// Update terakhir: Menggunakan Key baru dari Admin.
-const HARDCODED_API_KEY = "AIzaSyBMrRxQgSftwOs759tYqO8TYmq7BABxJCs"; 
+// Key ini digunakan jika Database Pusat tidak memberikan Key, atau Database belum disetting.
+// UPDATE: Menggunakan Key baru dari akun cadangan (Hardcoded Manual).
+const HARDCODED_API_KEY = "AIzaSyC1giXUCLPjCd8AW1aIGdQnMEsQD-SLnEI"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -62,61 +62,64 @@ Di akhir setiap respon, kamu WAJIB menyertakan tag emosi: [EMOTE: SMILE], [EMOTE
 `;
 
 let chatSession: Chat | null = null;
+let currentApiKeyUsed: string = "";
 
-// Helper untuk reset session (dipanggil saat Admin mengganti API Key)
 export const resetSession = () => {
   chatSession = null;
-  console.log("Chat session reset due to configuration change.");
+  console.log("Chat session reset.");
 };
 
-export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
+// Modified to accept a dynamic API Key from Global Config
+export const initializeChat = (adminAnnouncement: string = "", globalApiKey: string = ""): Chat | null => {
+  
   // Logic Prioritas API Key:
-  // 1. LocalStorage (HANYA BERLAKU DI PERANGKAT INI - Debugging/Admin Device)
-  // 2. Environment Variable
-  // 3. Hardcoded (DEFAULT GLOBAL - Berlaku untuk semua pengunjung)
-  const localKey = typeof window !== 'undefined' ? localStorage.getItem('kero_gemini_api_key') : null;
+  // 1. Global Config (Dari Firebase/Database Pusat) - PRIORITAS UTAMA
+  // 2. Hardcoded (Fallback jika Database mati/kosong)
   
-  if (localKey) {
-    console.log("Using LOCAL OVERRIDE API Key (Admin Device Only)");
+  const apiKey = (globalApiKey && globalApiKey.trim() !== "") ? globalApiKey : HARDCODED_API_KEY;
+  
+  if (globalApiKey) {
+    console.log("Menggunakan API Key dari DATABASE PUSAT (Global)");
+  } else {
+    console.log("Menggunakan API Key CADANGAN (Hardcoded)");
   }
   
-  const apiKey = localKey || process.env.API_KEY || HARDCODED_API_KEY;
-  
-  // Prevent crash if API key is missing
   if (!apiKey || apiKey.trim() === "") {
-    console.warn("Gemini API Key is missing. Chat features will be disabled.");
+    console.warn("Gemini API Key is missing.");
     return null;
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    
-    // Inject admin announcement into the system instruction if it exists
-    let finalInstruction = BASE_INSTRUCTION;
-    if (adminAnnouncement && adminAnnouncement.trim() !== "") {
-      finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
+  // Jika key berubah atau session belum ada, buat baru
+  if (!chatSession || currentApiKeyUsed !== apiKey) {
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      
+      let finalInstruction = BASE_INSTRUCTION;
+      if (adminAnnouncement && adminAnnouncement.trim() !== "") {
+        finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
+      }
+
+      chatSession = ai.chats.create({
+        model: 'gemini-2.0-flash-exp', 
+        config: {
+          systemInstruction: finalInstruction,
+          temperature: 0.7,
+        },
+      });
+      currentApiKeyUsed = apiKey;
+      return chatSession;
+    } catch (error) {
+      console.error("Failed to initialize Gemini:", error);
+      return null;
     }
-
-    // Menggunakan model 'gemini-2.0-flash-exp' untuk stabilitas kuota yang lebih baik
-    chatSession = ai.chats.create({
-      model: 'gemini-2.0-flash-exp', 
-      config: {
-        systemInstruction: finalInstruction,
-        temperature: 0.7,
-      },
-    });
-    return chatSession;
-  } catch (error) {
-    console.error("Failed to initialize Gemini:", error);
-    return null;
   }
+
+  return chatSession;
 };
 
-export const sendMessageToGemini = async (message: string, adminAnnouncement: string = ""): Promise<{ text: string; emote: EmoteType }> => {
-  // Try to initialize if not exists
-  if (!chatSession) {
-    initializeChat(adminAnnouncement);
-  }
+export const sendMessageToGemini = async (message: string, adminAnnouncement: string = "", globalApiKey: string = ""): Promise<{ text: string; emote: EmoteType }> => {
+  // Always try to init/refresh session with latest config
+  initializeChat(adminAnnouncement, globalApiKey);
 
   if (!chatSession) {
     return {
@@ -129,7 +132,6 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     const result = await chatSession.sendMessage({ message });
     const rawText = result.text || "";
 
-    // Extract Emote
     let emote = EmoteType.NEUTRAL;
     let cleanText = rawText;
 
@@ -152,9 +154,7 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    // Default friendly maintenance message
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang dalam pemeliharaan sistem berkala. Mohon coba beberapa saat lagi.";
-    
     const errString = error.toString().toLowerCase();
     if (errString.includes("429") || errString.includes("quota")) {
       console.warn("Quota Exceeded Detected.");
