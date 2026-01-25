@@ -4,14 +4,9 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY
 // =============================================================================================
-// CARA 1 (Disarankan untuk Hosting/Vercel): 
-// Biarkan kosong, dan atur "API_KEY" di Environment Variables hosting Anda.
-//
-// CARA 2 (Untuk Testing Cepat/Lokal): 
-// Tempel API Key Google Gemini Anda di dalam tanda kutip di bawah ini.
-// Dapatkan key di: https://aistudio.google.com/
+// Kunci bawaan (Fallback).
+// Jika kuota habis, user bisa memasukkan key sendiri via Admin Panel.
 const HARDCODED_API_KEY = "AIzaSyCW2QGvx-wY3hQFag0JF52jceEKcynh3zs"; 
-// Contoh: const HARDCODED_API_KEY = "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxx";
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -68,9 +63,19 @@ Di akhir setiap respon, kamu WAJIB menyertakan tag emosi: [EMOTE: SMILE], [EMOTE
 
 let chatSession: Chat | null = null;
 
+// Helper untuk reset session (dipanggil saat Admin mengganti API Key)
+export const resetSession = () => {
+  chatSession = null;
+  console.log("Chat session reset due to configuration change.");
+};
+
 export const initializeChat = (adminAnnouncement: string = ""): Chat | null => {
-  // Logic to choose API Key: Environment Variable OR Hardcoded fallback
-  const apiKey = process.env.API_KEY || HARDCODED_API_KEY;
+  // Logic Prioritas API Key:
+  // 1. LocalStorage (Settingan Admin User)
+  // 2. Environment Variable
+  // 3. Hardcoded (Fallback)
+  const localKey = typeof window !== 'undefined' ? localStorage.getItem('kero_gemini_api_key') : null;
+  const apiKey = localKey || process.env.API_KEY || HARDCODED_API_KEY;
   
   // Prevent crash if API key is missing
   if (!apiKey || apiKey.trim() === "") {
@@ -107,10 +112,10 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     initializeChat(adminAnnouncement);
   }
 
-  // Check if session exists (indirectly checks if API Key was valid)
+  // Check if session exists (indirectly checks if API Key was valid during init)
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key belum diatur).\n\n**Untuk Pengembang:**\nSilakan buka file `services/geminiService.ts` dan tempel API Key Google Gemini Anda pada variabel `HARDCODED_API_KEY`. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem belum terhubung ke server (API Key kosong).\n\n**Info:** Masuk ke menu Admin (klik 'Admin Login' di menu) dan masukkan API Key Google Gemini yang valid pada kolom konfigurasi. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
@@ -139,10 +144,21 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
 
     return { text: cleanText, emote };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Error:", error);
+    
+    let errorMessage = "Mohon maaf Gek/Bli, sistem Sithem sedang ada gangguan sinyal.";
+    
+    // Deteksi Error Umum
+    const errString = error.toString().toLowerCase();
+    if (errString.includes("429") || errString.includes("quota")) {
+      errorMessage = "Mohon maaf, **Kuota API Key Harian Habis**. \n\nSilakan lapor ke Admin untuk mengganti API Key di panel Admin, atau coba lagi besok.";
+    } else if (errString.includes("400") || errString.includes("key") || errString.includes("permission")) {
+      errorMessage = "Mohon maaf, **API Key Tidak Valid/Kedaluwarsa**. \n\nSilakan update API Key di menu Admin Login.";
+    }
+
     return { 
-      text: "Mohon maaf Gek/Bli, sistem Sithem sedang ada gangguan sinyal sedikit. Bisa diulangi pertanyaannya? Suksma. [EMOTE: BOW]", 
+      text: `${errorMessage} [EMOTE: BOW]`, 
       emote: EmoteType.SERIOUS 
     };
   }
