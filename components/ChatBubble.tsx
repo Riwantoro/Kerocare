@@ -1,10 +1,11 @@
 import React from 'react';
 import { Message, Sender } from '../types';
-import { LOGO_URL } from '../App';
 
 interface ChatBubbleProps {
   message: Message;
 }
+
+const SITHEM_AVATAR = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
   const isUser = message.sender === Sender.USER;
@@ -25,20 +26,20 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
       
       {/* Avatar */}
       <div className="flex-shrink-0 flex flex-col justify-end">
-        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-sm overflow-hidden border ${isUser ? 'bg-blue-100 border-blue-200' : 'bg-white border-gray-200'}`}>
+        <div className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-md overflow-hidden border-2 ${isUser ? 'bg-blue-100 border-white' : 'bg-slate-900 border-yellow-500'}`}>
           {isUser ? (
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6 text-blue-600">
                <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
              </svg>
           ) : (
-             <img src={LOGO_URL} alt="Bot" className="w-full h-full object-contain p-0.5" />
+             <img src={SITHEM_AVATAR} alt="Bot" className="w-full h-full object-contain p-0.5" />
           )}
         </div>
       </div>
 
       {/* Bubble */}
       <div
-        className={`relative max-w-[80%] md:max-w-[70%] rounded-2xl px-5 py-3.5 shadow-sm text-sm md:text-base leading-relaxed transition-transform duration-200 hover:-translate-y-0.5 ${
+        className={`relative max-w-[85%] md:max-w-[70%] rounded-2xl px-5 py-3.5 shadow-sm text-sm md:text-base leading-relaxed transition-transform duration-200 hover:-translate-y-0.5 ${
           isUser
             ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-none shadow-blue-200/50'
             : 'bg-white text-slate-700 border border-gray-100 rounded-tl-none shadow-gray-200/50'
