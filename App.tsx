@@ -243,50 +243,43 @@ const App: React.FC = () => {
         {/* Right Panel: Chat Interface */}
         <div className="w-full md:w-2/3 flex flex-col h-full relative">
           
-          {/* Mobile Background (Engaging Gradient + Pattern) */}
+          {/* Mobile Background (Simple Gradient) */}
           <div className="md:hidden absolute inset-0 z-0 bg-slate-50 overflow-hidden">
-             {/* Base Gradient */}
-             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-slate-50 to-yellow-50/50"></div>
-             
-             {/* Animated Blobs for depth */}
-             <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl animate-blob"></div>
-             <div className="absolute top-40 -left-20 w-72 h-72 bg-yellow-200/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-             
-             {/* Subtle Texture Overlay */}
-             <div className="absolute inset-0 opacity-[0.03]" style={{ 
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230f172a' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                backgroundSize: '20px 20px'
-             }}></div>
+             <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-white"></div>
           </div>
 
-          {/* Sticky Header Mobile (Official & Modern) */}
-          <div className="md:hidden bg-slate-900/95 backdrop-blur-xl px-4 py-3 border-b border-white/10 flex items-center justify-between shadow-lg sticky top-0 z-50 transition-all">
-             <div className="flex items-center gap-3">
-               <div className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 p-1.5">
-                  <img src={LOGO_URL} alt="Logo Kemenkumham" className="w-full h-full object-contain drop-shadow-sm" />
-               </div>
-               <div className="flex flex-col">
-                  <h1 className="font-bold text-white text-sm tracking-wide leading-none">KERO-CARE</h1>
-                  <div className="flex items-center gap-1.5 mt-1">
-                     <span className="relative flex h-2 w-2">
-                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                     </span>
-                     <span className="text-[10px] text-slate-300 font-medium">Lapas Kelas IIA Kerobokan</span>
-                  </div>
-               </div>
+          {/* Sticky Header Mobile (REF: Mas Bewok Style) */}
+          <div className="md:hidden sticky top-0 z-50 transition-all">
+             {/* The Rounded Card Container */}
+             <div className="bg-white rounded-b-[2rem] shadow-xl pb-4 pt-3 px-6 mx-auto w-full relative">
+                
+                {/* Back Arrow (Decor) */}
+                <div className="absolute left-6 top-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-800">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </div>
+
+                {/* Right Action (Decor) */}
+                <div className="absolute right-6 top-6" onClick={() => setIsMobileInfoOpen(true)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-slate-800">
+                    <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 5.25V4.5z" clipRule="evenodd" />
+                  </svg>
+                </div>
+
+                {/* Center Content: Name & Status */}
+                <div className="flex flex-col items-center justify-center pt-2">
+                   <h1 className="font-extrabold text-xl text-slate-900 tracking-tight">Sithem</h1>
+                   <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-xs font-medium text-slate-500">online</span>
+                   </div>
+                </div>
+
              </div>
-             <button 
-                onClick={() => setIsMobileInfoOpen(true)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-yellow-400 border border-white/5 transition-all active:scale-95"
-             >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                   <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                </svg>
-             </button>
           </div>
           
-          {/* Announcement Banner */}
+          {/* Announcement Banner (Adjusted Position) */}
           {announcement && (
             <div className="relative z-10 bg-orange-100 px-4 py-2 text-xs text-orange-900 border-b border-orange-200 flex items-center gap-2 shadow-sm">
                <span className="flex h-2 w-2 relative flex-shrink-0">
