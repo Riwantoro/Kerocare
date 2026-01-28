@@ -10,6 +10,9 @@ import AdminModal from './components/AdminModal';
 export const LOGO_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353691/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan__2024_1_ihjxaz.png";
 const SITHEM_IMG_URL = "https://res.cloudinary.com/dim98gun7/image/upload/v1769353649/sithem_kpqggx.svg";
 
+// Batasan Pertanyaan per Sesi untuk Menghemat Token
+const MAX_QUESTIONS = 10;
+
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +23,9 @@ const App: React.FC = () => {
   // State for Global Config
   const [announcement, setAnnouncement] = useState('');
   const [globalApiKey, setGlobalApiKey] = useState('');
+  
+  // Counter Pertanyaan
+  const [questionCount, setQuestionCount] = useState(0);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -55,8 +61,8 @@ const App: React.FC = () => {
     // Only set initial greeting if chat is empty
     if (messages.length === 0) {
         const greetingText = announcement 
-          ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, ada yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
-          : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**. Sesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
+          ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\nAda yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
+          : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\n\nSesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
 
         setMessages([
           {
@@ -90,8 +96,25 @@ const App: React.FC = () => {
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMsg]);
+
+    // CEK LIMIT PERTANYAAN
+    if (questionCount >= MAX_QUESTIONS) {
+        setTimeout(() => {
+            const limitMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                text: "⚠️ **Kuota Pertanyaan Habis**\n\nMohon maaf Gek/Bli, untuk menjaga kualitas layanan, sesi tanya jawab otomatis dibatasi.\n\nJika butuh informasi lebih mendalam atau pengaduan, silakan hubungi petugas kami via WhatsApp:\n\n👉 **WA Pengaduan: 0811 3988 664**\n\nSuksma. [EMOTE: BOW]",
+                sender: Sender.BOT,
+                timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, limitMsg]);
+            setCurrentEmote(EmoteType.BOW);
+        }, 600);
+        return;
+    }
+
     setIsLoading(true);
     setCurrentEmote(EmoteType.NEUTRAL); 
+    setQuestionCount(prev => prev + 1); // Tambah counter
 
     // Pass the globalApiKey to the service
     const response = await sendMessageToGemini(text, announcement, globalApiKey);
@@ -152,7 +175,7 @@ const App: React.FC = () => {
             <p className="text-sm text-yellow-100 opacity-90">Asisten Digital Humas</p>
             <div className="mt-4 flex gap-2 justify-center mb-6">
                <span className="px-3 py-1 bg-black/30 rounded-full text-xs backdrop-blur-sm border border-white/10 shadow-inner text-yellow-200">Gratis</span>
-               <span className="px-3 py-1 bg-black/30 rounded-full text-xs backdrop-blur-sm border border-white/10 shadow-inner text-yellow-200">Resmi</span>
+               <span className="px-3 py-1 bg-black/30 rounded-full text-xs backdrop-blur-sm border border-white/10 shadow-inner text-yellow-200">900 Bahasa</span>
             </div>
             
             <button 
@@ -305,7 +328,7 @@ const App: React.FC = () => {
 
           {/* Input Area */}
           <div className="relative z-20">
-             <InputArea onSendMessage={handleSendMessage} isLoading={isLoading} />
+             <InputArea onSendMessage={handleSendMessage} isLoading={isLoading || questionCount >= MAX_QUESTIONS} />
           </div>
         </div>
       </div>
