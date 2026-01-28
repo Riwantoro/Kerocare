@@ -243,37 +243,51 @@ const App: React.FC = () => {
         {/* Right Panel: Chat Interface */}
         <div className="w-full md:w-2/3 flex flex-col h-full relative">
           
-          {/* Mobile Background (Simple Gradient) */}
-          <div className="md:hidden absolute inset-0 z-0 bg-slate-50 overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-white"></div>
+          {/* Mobile Background (Pattern & Gradient) */}
+          <div className="md:hidden absolute inset-0 z-0 overflow-hidden bg-pattern-bali">
+             {/* Gradient Overlay for Aesthetics */}
+             <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 via-transparent to-yellow-50/60"></div>
           </div>
 
           {/* Sticky Header Mobile (REF: Mas Bewok Style) */}
           <div className="md:hidden sticky top-0 z-50 transition-all">
              {/* The Rounded Card Container */}
-             <div className="bg-white rounded-b-[2rem] shadow-xl pb-4 pt-3 px-6 mx-auto w-full relative">
+             <div className="bg-white rounded-b-[2rem] shadow-xl pb-4 pt-3 px-4 mx-auto w-full relative z-20">
                 
                 {/* Back Arrow (Decor) */}
-                <div className="absolute left-6 top-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-800">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
                 </div>
 
                 {/* Right Action (Decor) */}
-                <div className="absolute right-6 top-6" onClick={() => setIsMobileInfoOpen(true)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-slate-800">
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2" onClick={() => setIsMobileInfoOpen(true)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-slate-700">
                     <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 5.25V4.5z" clipRule="evenodd" />
                   </svg>
                 </div>
 
-                {/* Center Content: Name & Status */}
-                <div className="flex flex-col items-center justify-center pt-2">
-                   <h1 className="font-extrabold text-xl text-slate-900 tracking-tight">Sithem</h1>
-                   <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-xs font-medium text-slate-500">online</span>
+                {/* Center Content: Avatar & Text */}
+                <div className="flex flex-col items-center justify-center">
+                   
+                   {/* Profile Icon (Face Only) */}
+                   <div className="w-12 h-12 rounded-full border-2 border-yellow-400 bg-slate-100 overflow-hidden shadow-sm mb-1 relative">
+                      {/* Zoomed in/scaled to show face */}
+                      <img 
+                        src={SITHEM_IMG_URL} 
+                        alt="Sithem Face" 
+                        className="w-full h-full object-cover transform scale-[1.8] translate-y-2" 
+                      />
+                      {/* Online Status Dot overlay */}
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                    </div>
+
+                   {/* Name & Title */}
+                   <h1 className="font-extrabold text-lg text-slate-900 leading-tight">Sithem</h1>
+                   <p className="text-[10px] text-slate-500 font-medium tracking-tight text-center max-w-[200px] leading-3">
+                     Layanan Informasi Cepat Lapas Kerobokan
+                   </p>
                 </div>
 
              </div>
