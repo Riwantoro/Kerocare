@@ -249,45 +249,50 @@ const App: React.FC = () => {
              <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 via-transparent to-yellow-50/60"></div>
           </div>
 
-          {/* Sticky Header Mobile (REF: Mas Bewok Style) */}
+          {/* Sticky Header Mobile (Compact & Clean) */}
           <div className="md:hidden sticky top-0 z-50 transition-all">
-             {/* The Rounded Card Container */}
-             <div className="bg-white rounded-b-[2rem] shadow-xl pb-4 pt-3 px-4 mx-auto w-full relative z-20">
+             <div className="bg-white rounded-b-3xl shadow-lg py-3 px-4 mx-auto w-full relative z-20">
                 
-                {/* Back Arrow (Decor) */}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                  </svg>
-                </div>
+                <div className="flex items-center justify-between">
+                   {/* Left Group: Back + Avatar + Text */}
+                   <div className="flex items-center gap-3">
+                      
+                      {/* Back Icon (Functional Aesthetic) */}
+                      <div className="text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                      </div>
 
-                {/* Right Action (Decor) */}
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2" onClick={() => setIsMobileInfoOpen(true)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-slate-700">
-                    <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 5.25V4.5z" clipRule="evenodd" />
-                  </svg>
-                </div>
-
-                {/* Center Content: Avatar & Text */}
-                <div className="flex flex-col items-center justify-center">
-                   
-                   {/* Profile Icon (Face Only) */}
-                   <div className="w-12 h-12 rounded-full border-2 border-yellow-400 bg-slate-100 overflow-hidden shadow-sm mb-1 relative">
-                      {/* Zoomed in/scaled to show face */}
-                      <img 
-                        src={SITHEM_IMG_URL} 
-                        alt="Sithem Face" 
-                        className="w-full h-full object-cover transform scale-[1.8] translate-y-2" 
-                      />
-                      {/* Online Status Dot overlay */}
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                      {/* Avatar Group */}
+                      <div className="flex items-center gap-3">
+                          {/* Compact Avatar */}
+                          <div className="relative w-10 h-10 rounded-full border border-slate-200 bg-slate-50 overflow-hidden flex-shrink-0">
+                             <img 
+                                src={SITHEM_IMG_URL} 
+                                alt="Sithem" 
+                                className="w-full h-full object-cover transform scale-[1.6] translate-y-1" 
+                             />
+                             <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                          </div>
+                          
+                          {/* Text Info (Left Aligned) */}
+                          <div className="flex flex-col">
+                             <h1 className="font-bold text-base text-slate-900 leading-none">Sithem</h1>
+                             <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Layanan Informasi Cepat</p>
+                          </div>
+                      </div>
                    </div>
 
-                   {/* Name & Title */}
-                   <h1 className="font-extrabold text-lg text-slate-900 leading-tight">Sithem</h1>
-                   <p className="text-[10px] text-slate-500 font-medium tracking-tight text-center max-w-[200px] leading-3">
-                     Layanan Informasi Cepat Lapas Kerobokan
-                   </p>
+                   {/* Right Action: Info */}
+                   <button 
+                      onClick={() => setIsMobileInfoOpen(true)}
+                      className="p-2 -mr-2 text-slate-400 hover:text-slate-600 active:scale-95 transition"
+                   >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 5.25V4.5z" clipRule="evenodd" />
+                      </svg>
+                   </button>
                 </div>
 
              </div>
