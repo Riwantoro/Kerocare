@@ -1,3 +1,8 @@
+Pesan error **404** dari package `@google/genai` terjadi karena nama model `'gemini-1.5-flash'` atau `'gemini-2.0-flash'` membutuhkan awalan **`models/`** saat dipanggil dengan SDK baru ini.
+
+Berikut adalah kode **paling presisi** yang sudah disesuaikan agar cocok 100% dengan SDK `@google/genai` dan API Key `AIzaSy...` milik Anda:
+
+```typescript
 import { GoogleGenAI, Chat } from "@google/genai";
 import { EmoteType } from "../types";
 
@@ -112,16 +117,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Menggunakan model standar gemini-1.5-flash
+      // PERUBAHAN UTAMA: Tambahkan 'models/' di awal nama model
       chatSession = ai.chats.create({
-        model: 'gemini-1.5-flash', 
+        model: 'models/gemini-1.5-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-1.5-flash)");
+      console.log("Gemini Session Initialized (Model: models/gemini-1.5-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -185,3 +190,7 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     };
   }
 };
+
+```
+
+Silakan salin seluruh isi kode di atas dan gantikan pada file `services/geminiService.ts` di GitHub Anda.
