@@ -115,14 +115,14 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
 
       // Menggunakan penamaan 'models/gemini-1.5-flash' sesuai kriteria SDK @google/genai
       chatSession = ai.chats.create({
-        model: 'models/gemini-1.5-flash', 
+        model: 'models/gemini-3-flash-preview', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: models/gemini-1.5-flash)");
+      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
