@@ -44,7 +44,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tanya Sithem (Misal: Syarat kunjungan...)"
+            placeholder="Tanya Sithem / Ask Sithem (Bahasa Indonesia, English, etc.)"
             className="w-full bg-gray-100 border-0 rounded-2xl px-4 py-3 pr-12 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none overflow-hidden min-h-[50px] max-h-[120px]"
             rows={1}
             disabled={isLoading}

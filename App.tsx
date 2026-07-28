@@ -61,8 +61,8 @@ const App: React.FC = () => {
     // Only set initial greeting if chat is empty
     if (messages.length === 0) {
         const greetingText = announcement 
-          ? `**Om Swastiastu!**\n\n⚠️ **PENGUMUMAN PENTING:**\n${announcement}\n\nSaya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\nAda yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
-          : "**Om Swastiastu!**\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan.\n\nSaya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\n\nSesuai jadwal terbaru:\n- **Pagi**: 09.00 - 11.30 WITA\n- **Siang**: 13.00 - 14.30 WITA.\n\nSilakan tanya jadwal Wisma atau syarat kunjungan!";
+          ? `**Om Swastiastu / Welcome!**\n\n⚠️ **PENGUMUMAN PENTING / IMPORTANT ANNOUNCEMENT:**\n${announcement}\n\nSaya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\nI can assist you in your preferred language.\n\nAda yang bisa dibantu terkait info di atas atau jadwal kunjungan?`
+          : "**Om Swastiastu / Welcome!**\n\nSelamat datang di layanan Kero-Care Lapas Kelas IIA Kerobokan. Saya **Sithem**, siap melayani informasi dalam **900 bahasa dunia & daerah**.\n\nWelcome to Kero-Care, Kerobokan Class IIA Correctional Facility. I can assist you in **900 world and local languages**—please write in your preferred language.\n\n**Jam kunjungan / Visiting hours**\n- Pagi / Morning: 09.00–11.30 WITA\n- Siang / Afternoon: 13.00–14.30 WITA\n\nSilakan tanya jadwal wisma, syarat kunjungan, atau layanan integrasi. / Ask me about your housing block schedule, visiting rules, or integration services.";
 
         setMessages([
           {
@@ -102,7 +102,7 @@ const App: React.FC = () => {
         setTimeout(() => {
             const limitMsg: Message = {
                 id: (Date.now() + 1).toString(),
-                text: "⚠️ **Kuota Pertanyaan Habis**\n\nMohon maaf Gek/Bli, untuk menjaga kualitas layanan, sesi tanya jawab otomatis dibatasi.\n\nJika butuh informasi lebih mendalam atau pengaduan, silakan hubungi petugas kami via WhatsApp:\n\n👉 **WA Pengaduan: 0811 3988 664**\n\nSuksma. [EMOTE: BOW]",
+                text: "⚠️ **Kuota Pertanyaan Habis / Question Limit Reached**\n\nMohon maaf, sesi tanya jawab otomatis dibatasi. / This chat session has reached its limit.\n\nUntuk informasi lebih lanjut atau pengaduan / For further assistance or complaints:\n👉 **WA Pengaduan / Complaints: 0811 3988 664**\n👉 **WA Integrasi / Integration: 087791856966**\n\nSuksma. [EMOTE: BOW]",
                 sender: Sender.BOT,
                 timestamp: new Date(),
             };
@@ -199,7 +199,7 @@ const App: React.FC = () => {
               }}></div>
               
               <div className="relative z-10 flex justify-between items-center mb-6">
-                <h2 className="font-bold text-lg text-yellow-400">Tentang Sithem</h2>
+                <h2 className="font-bold text-lg text-yellow-400">Tentang Sithem / About Sithem</h2>
                 <button onClick={() => setIsMobileInfoOpen(false)} className="text-white/80 hover:text-white">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -218,13 +218,14 @@ const App: React.FC = () => {
                  <p className="text-xs text-slate-300 mt-1">Lapas Kelas IIA Kerobokan</p>
                  <div className="mt-6 space-y-3 w-full">
                     <div className="bg-white/5 p-4 rounded-xl text-sm border border-yellow-500/20 shadow-lg">
-                      <span className="block font-bold text-yellow-400 mb-2 border-b border-yellow-500/20 pb-1">Jadwal Kunjungan</span>
+                      <span className="block font-bold text-yellow-400 mb-2 border-b border-yellow-500/20 pb-1">Jadwal Kunjungan / Visiting Hours</span>
                       <div className="flex justify-between text-xs text-slate-200">
-                        <span>Pagi</span><span className="font-mono">09.00 - 11.30</span>
+                        <span>Pagi / Morning</span><span className="font-mono">09.00 - 11.30</span>
                       </div>
                       <div className="flex justify-between text-xs mt-2 text-slate-200">
-                        <span>Siang</span><span className="font-mono">13.00 - 14.30</span>
+                        <span>Siang / Afternoon</span><span className="font-mono">13.00 - 14.30</span>
                       </div>
+                      <p className="mt-3 text-[10px] leading-relaxed text-yellow-100">Tulis pertanyaan dalam bahasa pilihan Anda. / Ask in your preferred language.</p>
                     </div>
                  </div>
               </div>
@@ -271,7 +272,7 @@ const App: React.FC = () => {
                           {/* Text Info (Left Aligned) */}
                           <div className="flex flex-col">
                              <h1 className="font-bold text-base text-slate-900 leading-none">Sithem</h1>
-                             <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Layanan Informasi Cepat</p>
+                             <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Layanan Informasi / Information Service</p>
                           </div>
                       </div>
                    </div>
