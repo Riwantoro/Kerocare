@@ -4,7 +4,9 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-const HARDCODED_API_KEY = "AIzaSyAxiPtWF_jemX9OkrNf4VO6q1IsNJpglZg"; 
+// Key Baru dari Bli (AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY)
+// Kita set ini sebagai PRIMARY KEY agar tidak tertimpa oleh key lama di database.
+const HARDCODED_API_KEY = "AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -40,13 +42,11 @@ Kalapas (Kepala Lembaga Pemasyarakatan): Bapak Hudi Ismono.
 
 [Aturan Pengetahuan - JADWAL KUNJUNGAN RESMI]
 Patuhi jadwal spesifik blok hunian (Wisma) berikut ini:
-- **Senin**: Wisma Yudistira A1–A20
-- **Selasa**: Wisma Yudistira B1–B20
-- **Rabu**: Wisma Bima C1–C21
-- **Kamis**: Wisma Bima D1–D21
+- **Senin**: Wisma Yudistira A
+- **Selasa**: Wisma Yudistira B
+- **Rabu**: Wisma Bima A
+- **Kamis**: Wisma Bima B
 - **Jumat**: Wisma Arjuna, Dapur, dan Klinik
-
-Layanan kunjungan **TUTUP** setiap Sabtu, Minggu, dan hari libur nasional. Jadwal dapat berubah sesuai ketentuan Lapas Kerobokan.
 
 [Aturan Pengetahuan - SESI WAKTU]
 Layanan kunjungan dibagi menjadi dua sesi:
@@ -55,15 +55,6 @@ Layanan kunjungan dibagi menjadi dua sesi:
 
 [Aturan Pengetahuan - SYARAT TITIPAN BARANG]
 Untuk layanan titipan barang, syarat administrasi cukup membawa **fotokopi KTP** saja.
-
-[Aturan Pengetahuan - TATA TERTIB KUNJUNGAN & TITIPAN]
-Saat menjawab pertanyaan yang relevan, sampaikan aturan berikut secara jelas:
-1. Warga binaan yang sedang menjalani sidang tidak dapat dikunjungi dan tidak dapat menerima titipan barang.
-2. Warga binaan yang menjalani MAPENALING, strafcell/sel pengasingan, atau tutupan sunyi tidak dapat menerima kunjungan maupun titipan barang.
-3. Setiap warga binaan mendapat kesempatan kunjungan maksimal 1 kali dalam 1 minggu, dengan durasi maksimal 15 menit (dihitung sejak pengunjung masuk ruang kunjungan).
-4. Pengunjung utama adalah keluarga inti, maksimal 5 orang. Pengunjung non-keluarga inti wajib didampingi 1 keluarga inti; jumlah seluruh pengunjung tetap maksimal 5 orang.
-5. Berat titipan maksimal 2 kg.
-6. Jadwal dan layanan dapat berubah untuk kondisi tertentu.
 
 [Aturan Pengetahuan - TATA TERTIB BERPAKAIAN & KEAMANAN]
 Saat menjelaskan syarat kunjungan atau titipan, kamu WAJIB mengingatkan hal berikut:
@@ -75,7 +66,7 @@ Saat menjelaskan syarat kunjungan atau titipan, kamu WAJIB mengingatkan hal beri
 Jika pengguna bertanya tentang kontak pengaduan atau informasi integrasi lebih lanjut, berikan nomor resmi berikut:
 1. **Layanan Pengaduan (WA)**: 0811 3988 664
    (Gunakan kalimat: "Jika ada keluhan terkait layanan, silakan hubungi WA Pengaduan Lapas Kerobokan di...")
-2. **Layanan Integrasi PB/CB/Remisi (WA)**: 087791856966
+2. **Layanan Integrasi PB/CB/Remisi (WA)**: 097759209659
    (Gunakan kalimat: "Untuk informasi detail terkait Integrasi, Gek/Bli bisa chat langsung ke WA Integrasi di...")
 
 [Aturan Pengetahuan - Data Warga Binaan & Informasi Mendalam]
@@ -95,14 +86,26 @@ export const resetSession = () => {
   console.log("Chat session reset.");
 };
 
+// Modified to accept a dynamic API Key from Global Config
 export const initializeChat = (adminAnnouncement: string = "", globalApiKey: string = ""): Chat | null => {
-  const apiKey = HARDCODED_API_KEY;
-
+  
+  // PERUBAHAN PENTING:
+  // Kita Paksa menggunakan HARDCODED_API_KEY yang baru.
+  // Ini untuk menghindari error jika 'globalApiKey' dari Database ternyata berisi key lama/kadaluarsa.
+  
+  // const apiKey = (globalApiKey && globalApiKey.trim() !== "") ? globalApiKey : HARDCODED_API_KEY; 
+  const apiKey = HARDCODED_API_KEY; // <-- FORCE NEW KEY
+  
+  if (globalApiKey && globalApiKey !== HARDCODED_API_KEY) {
+    console.log("NOTE: Mengabaikan Key Database demi kestabilan, menggunakan Key Hardcoded Baru.");
+  }
+  
   if (!apiKey || apiKey.trim() === "") {
     console.warn("Gemini API Key is missing.");
     return null;
   }
 
+  // Jika key berubah atau session belum ada, buat baru
   if (!chatSession || currentApiKeyUsed !== apiKey) {
     try {
       const ai = new GoogleGenAI({ apiKey });
@@ -112,15 +115,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
+      // Menggunakan Model 'gemini-3-flash-preview'
       chatSession = ai.chats.create({
-        model: 'models/gemini-1.5-flash', 
+        model: 'gemini-3-flash-preview', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: models/gemini-1.5-flash)");
+      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview) with Key:", apiKey.substring(0, 8) + "...");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -132,11 +136,12 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
 };
 
 export const sendMessageToGemini = async (message: string, adminAnnouncement: string = "", globalApiKey: string = ""): Promise<{ text: string; emote: EmoteType }> => {
+  // Always try to init/refresh session with latest config
   initializeChat(adminAnnouncement, globalApiKey);
 
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem (Koneksi API Key). Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem (Koneksi Database). Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
@@ -165,17 +170,28 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     return { text: cleanText, emote };
 
   } catch (error: any) {
-    console.error("=== GEMINI API ERROR ===", error);
+    // LOGGING LENGKAP UNTUK DEBUGGING DI CONSOLE BROWSER
+    console.error("=== GEMINI API ERROR ===");
+    console.error(error);
+    if (error.response) console.error("Response:", error.response);
+    console.error("========================");
     
+    // Pesan Default
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
+    
+    // Analisa Error untuk Debugging Pengguna
     const errString = error.toString().toLowerCase();
     
     if (errString.includes("429") || errString.includes("quota")) {
+      console.warn("KUOTA HABIS. Silakan Admin ganti API Key via Admin Panel.");
       errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       errorMessage = "Mohon maaf, sistem keamanan menolak koneksi (Error 403 / Key Invalid). Silakan periksa kembali API Key Anda.";
+       const hostname = window.location.hostname;
+       console.warn(`AKSES DITOLAK (403). Cek Google Cloud Console > APIs & Services > Credentials.`);
+       errorMessage = `Mohon maaf, sistem keamanan menolak koneksi (Error 403). Pastikan domain ${hostname} sudah di-whitelist di Google Console.`;
     } else if (errString.includes("404") || errString.includes("not found")) {
-       errorMessage = "Mohon maaf, layanan model AI belum ditemukan/aktif (Error 404).";
+       console.warn("MODEL TIDAK DITEMUKAN (404).");
+       errorMessage = "Mohon maaf, layanan AI belum aktif di akun Google Cloud Admin (Error 404).";
     }
 
     return { 
