@@ -4,9 +4,8 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-// Key Baru dari Bli (AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY)
-// Kita set ini sebagai PRIMARY KEY agar tidak tertimpa oleh key lama di database.
-const HARDCODED_API_KEY = "AIzaSyAxiPtWF_jemX9OkrNf4VO6q1IsNJpglZg"; 
+// Pastikan memasukkan API Key lengkap 39 karakter dari Google AI Studio
+const HARDCODED_API_KEY = "AIzaSyCW2QGvx-wY3hQFag0JF52jceEKcynh3zs"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -97,26 +96,14 @@ export const resetSession = () => {
   console.log("Chat session reset.");
 };
 
-// Modified to accept a dynamic API Key from Global Config
 export const initializeChat = (adminAnnouncement: string = "", globalApiKey: string = ""): Chat | null => {
-  
-  // PERUBAHAN PENTING:
-  // Kita Paksa menggunakan HARDCODED_API_KEY yang baru.
-  // Ini untuk menghindari error jika 'globalApiKey' dari Database ternyata berisi key lama/kadaluarsa.
-  
-  // const apiKey = (globalApiKey && globalApiKey.trim() !== "") ? globalApiKey : HARDCODED_API_KEY; 
-  const apiKey = HARDCODED_API_KEY; // <-- FORCE NEW KEY
-  
-  if (globalApiKey && globalApiKey !== HARDCODED_API_KEY) {
-    console.log("NOTE: Mengabaikan Key Database demi kestabilan, menggunakan Key Hardcoded Baru.");
-  }
-  
-  if (!apiKey || apiKey.trim() === "") {
-    console.warn("Gemini API Key is missing.");
+  const apiKey = HARDCODED_API_KEY;
+
+  if (!apiKey || apiKey.trim() === "" || apiKey === "PASTE_API_KEY_BARU_ANDA_DI_SINI") {
+    console.warn("Gemini API Key is missing or default.");
     return null;
   }
 
-  // Jika key berubah atau session belum ada, buat baru
   if (!chatSession || currentApiKeyUsed !== apiKey) {
     try {
       const ai = new GoogleGenAI({ apiKey });
@@ -126,7 +113,7 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Menggunakan Model 'gemini-3-flash-preview'
+      // Menggunakan model 'gemini-1.5-flash' yang stabil
       chatSession = ai.chats.create({
         model: 'gemini-1.5-flash', 
         config: {
@@ -135,7 +122,7 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview) with Key:", apiKey.substring(0, 8) + "...");
+      console.log("Gemini Session Initialized (Model: gemini-1.5-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -147,12 +134,11 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
 };
 
 export const sendMessageToGemini = async (message: string, adminAnnouncement: string = "", globalApiKey: string = ""): Promise<{ text: string; emote: EmoteType }> => {
-  // Always try to init/refresh session with latest config
   initializeChat(adminAnnouncement, globalApiKey);
 
   if (!chatSession) {
     return {
-      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem (Koneksi Database). Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
+      text: "Mohon maaf Gek/Bli, sistem Sithem sedang dalam pemeliharaan sistem (Koneksi API Key). Mohon coba beberapa saat lagi. Suksma. [EMOTE: BOW]",
       emote: EmoteType.BOW
     };
   }
@@ -181,28 +167,17 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     return { text: cleanText, emote };
 
   } catch (error: any) {
-    // LOGGING LENGKAP UNTUK DEBUGGING DI CONSOLE BROWSER
-    console.error("=== GEMINI API ERROR ===");
-    console.error(error);
-    if (error.response) console.error("Response:", error.response);
-    console.error("========================");
+    console.error("=== GEMINI API ERROR ===", error);
     
-    // Pesan Default
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
-    
-    // Analisa Error untuk Debugging Pengguna
     const errString = error.toString().toLowerCase();
     
     if (errString.includes("429") || errString.includes("quota")) {
-      console.warn("KUOTA HABIS. Silakan Admin ganti API Key via Admin Panel.");
       errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       const hostname = window.location.hostname;
-       console.warn(`AKSES DITOLAK (403). Cek Google Cloud Console > APIs & Services > Credentials.`);
-       errorMessage = `Mohon maaf, sistem keamanan menolak koneksi (Error 403). Pastikan domain ${hostname} sudah di-whitelist di Google Console.`;
+       errorMessage = "Mohon maaf, API Key tidak valid atau akses ditolak. Mohon periksa kembali API Key Anda.";
     } else if (errString.includes("404") || errString.includes("not found")) {
-       console.warn("MODEL TIDAK DITEMUKAN (404).");
-       errorMessage = "Mohon maaf, layanan AI belum aktif di akun Google Cloud Admin (Error 404).";
+       errorMessage = "Mohon maaf, model AI tidak ditemukan atau belum aktif.";
     }
 
     return { 
