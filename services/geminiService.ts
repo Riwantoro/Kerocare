@@ -6,7 +6,7 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // Key Baru dari Bli (AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY)
 // Kita set ini sebagai PRIMARY KEY agar tidak tertimpa oleh key lama di database.
-const HARDCODED_API_KEY = "AQ.Ab8RN6JXvFBleQ9D88JuGASrdIuO1tc5hCdMzdb3loWDNS1BmA"; 
+const HARDCODED_API_KEY = "AIzaSyAxiPtWF_jemX9OkrNf4VO6q1IsNJpglZg"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -128,7 +128,7 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
 
       // Menggunakan Model 'gemini-3-flash-preview'
       chatSession = ai.chats.create({
-        model: 'gemini-3-flash-preview', 
+        model: 'gemini-1.5-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
