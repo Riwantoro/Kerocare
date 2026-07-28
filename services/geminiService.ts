@@ -4,8 +4,8 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-// Pastikan memasukkan API Key lengkap 39 karakter dari Google AI Studio
-const HARDCODED_API_KEY = "AIzaSyCW2QGvx-wY3hQFag0JF52jceEKcynh3zs"; 
+// Masukkan API Key Anda dari Google AI Studio / Google Cloud
+const HARDCODED_API_KEY = "AQ.Ab8RN6LDZIFBIEDnZuXfgq3aB2-NGm-S1D0py9KKdKMcyQmFWg"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -99,8 +99,8 @@ export const resetSession = () => {
 export const initializeChat = (adminAnnouncement: string = "", globalApiKey: string = ""): Chat | null => {
   const apiKey = HARDCODED_API_KEY;
 
-  if (!apiKey || apiKey.trim() === "" || apiKey === "PASTE_API_KEY_BARU_ANDA_DI_SINI") {
-    console.warn("Gemini API Key is missing or default.");
+  if (!apiKey || apiKey.trim() === "") {
+    console.warn("Gemini API Key is missing.");
     return null;
   }
 
@@ -113,16 +113,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Menggunakan model 'gemini-1.5-flash' yang stabil
+      // Menggunakan penamaan 'models/gemini-1.5-flash' sesuai kriteria SDK @google/genai
       chatSession = ai.chats.create({
-        model: 'gemini-1.5-flash', 
+        model: 'models/gemini-1.5-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-1.5-flash)");
+      console.log("Gemini Session Initialized (Model: models/gemini-1.5-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -167,7 +167,8 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     return { text: cleanText, emote };
 
   } catch (error: any) {
-    console.error("=== GEMINI API ERROR ===", error);
+    console.error("=== GEMINI API ERROR ===");
+    console.error(error);
     
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
     const errString = error.toString().toLowerCase();
@@ -175,9 +176,9 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     if (errString.includes("429") || errString.includes("quota")) {
       errorMessage = "Mohon maaf, antrian sistem sedang penuh (Kuota Limit). Mohon lapor ke petugas.";
     } else if (errString.includes("403") || errString.includes("permission") || errString.includes("key")) {
-       errorMessage = "Mohon maaf, API Key tidak valid atau akses ditolak. Mohon periksa kembali API Key Anda.";
+       errorMessage = "Mohon maaf, sistem keamanan menolak koneksi (Error 403 / Key Invalid). Silakan periksa kembali API Key Anda.";
     } else if (errString.includes("404") || errString.includes("not found")) {
-       errorMessage = "Mohon maaf, model AI tidak ditemukan atau belum aktif.";
+       errorMessage = "Mohon maaf, layanan model AI belum ditemukan/aktif (Error 404).";
     }
 
     return { 
