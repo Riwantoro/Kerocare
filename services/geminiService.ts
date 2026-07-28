@@ -4,7 +4,6 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-// Masukkan API Key Anda dari Google AI Studio / Google Cloud
 const HARDCODED_API_KEY = "AQ.Ab8RN6IsrRfZDCTCYAX4BVCK8-mcC8HRBS_x5mSRbIgAh_Tlbg"; 
 // =============================================================================================
 
@@ -113,16 +112,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Menggunakan penamaan 'models/gemini-1.5-flash' sesuai kriteria SDK @google/genai
+      // Model resmi yang valid: gemini-2.0-flash atau gemini-1.5-flash
       chatSession = ai.chats.create({
-        model: 'models/gemini-3-flash-preview', 
+        model: 'gemini-2.0-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-3-flash-preview)");
+      console.log("Gemini Session Initialized (Model: gemini-2.0-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
@@ -167,8 +166,7 @@ export const sendMessageToGemini = async (message: string, adminAnnouncement: st
     return { text: cleanText, emote };
 
   } catch (error: any) {
-    console.error("=== GEMINI API ERROR ===");
-    console.error(error);
+    console.error("=== GEMINI API ERROR ===", error);
     
     let errorMessage = "Mohon maaf Gek/Bli, saat ini sistem Sithem sedang sibuk. Mohon coba kirim pesan lagi.";
     const errString = error.toString().toLowerCase();
