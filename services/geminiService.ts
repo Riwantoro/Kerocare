@@ -5,7 +5,7 @@ import { EmoteType } from "../types";
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
 // Masukkan API Key Anda dari Google AI Studio / Google Cloud
-const HARDCODED_API_KEY = "AQ.Ab8RN6LDZIFBIEDnZuXfgq3aB2-NGm-S1D0py9KKdKMcyQmFWg"; 
+const HARDCODED_API_KEY = "AQ.Ab8RN6IsrRfZDCTCYAX4BVCK8-mcC8HRBS_x5mSRbIgAh_Tlbg"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
