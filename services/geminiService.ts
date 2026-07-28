@@ -4,7 +4,7 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // KONFIGURASI API KEY (UTAMA)
 // =============================================================================================
-const HARDCODED_API_KEY = "AQ.Ab8RN6IsrRfZDCTCYAX4BVCK8-mcC8HRBS_x5mSRbIgAh_Tlbg"; 
+const HARDCODED_API_KEY = "AIzaSyAxiPtWF_jemX9OkrNf4VO6q1IsNJpglZg"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
@@ -112,16 +112,16 @@ export const initializeChat = (adminAnnouncement: string = "", globalApiKey: str
         finalInstruction += `\n\n[PENGUMUMAN PENTING DARI ADMIN - PRIORITAS TINGGI]\nAdmin telah menetapkan informasi terkini: "${adminAnnouncement}".\nJIKA informasi admin ini bertentangan dengan jadwal baku di atas, KAMU WAJIB MENGIKUTI INFORMASI ADMIN INI. Sampaikan ini kepada pengguna.`;
       }
 
-      // Model resmi yang valid: gemini-2.0-flash atau gemini-1.5-flash
+      // Menggunakan model standar gemini-1.5-flash
       chatSession = ai.chats.create({
-        model: 'gemini-2.0-flash', 
+        model: 'gemini-1.5-flash', 
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
         },
       });
       currentApiKeyUsed = apiKey;
-      console.log("Gemini Session Initialized (Model: gemini-2.0-flash)");
+      console.log("Gemini Session Initialized (Model: gemini-1.5-flash)");
       return chatSession;
     } catch (error) {
       console.error("Failed to initialize Gemini:", error);
