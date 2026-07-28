@@ -6,7 +6,7 @@ import { EmoteType } from "../types";
 // =============================================================================================
 // Key Baru dari Bli (AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY)
 // Kita set ini sebagai PRIMARY KEY agar tidak tertimpa oleh key lama di database.
-const HARDCODED_API_KEY = "AIzaSyDqa3l5Wbcl_OjsNnEascaXk02YnVHxooY"; 
+const HARDCODED_API_KEY = "AQ.Ab8RN6JXvFBleQ9D88JuGASrdIuO1tc5hCdMzdb3loWDNS1BmA"; 
 // =============================================================================================
 
 const BASE_INSTRUCTION = `
